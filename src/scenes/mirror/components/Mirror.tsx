@@ -1,18 +1,39 @@
-import { useGLTF, PerspectiveCamera } from "@react-three/drei";
-import MirrorGLTF from "../../../assets/mirror_of_loss.gltf";
+import {
+  useGLTF,
+  PerspectiveCamera,
+  MeshDistortMaterial,
+} from "@react-three/drei";
+import MirrorGLTF from "../../../assets/mirror_of_loss_2.gltf";
+import {
+  Color,
+  DebugLayerMaterial,
+  Depth,
+  Displace,
+  Fresnel,
+  LayerMaterial,
+} from "lamina";
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { MathUtils } from "three";
 
 export default function Mirror() {
   const { nodes } = useGLTF(MirrorGLTF);
+  const displaceRef = useRef(null);
+  const strength = useRef(0);
+
+  useFrame(({ clock }, delta) => {
+    displaceRef.current.strength = MathUtils.lerp(
+      displaceRef.current.strength, //
+      0.2,
+      0.1
+    );
+
+    displaceRef.current.offset.x += 0.3 * delta;
+  });
 
   return (
     <group dispose={null}>
       <group scale={0.01}>
-        <directionalLight
-          name="Directional_Light"
-          intensity={1}
-          decay={2}
-          rotation={[0, 0, -0.139]}
-        />
         <PerspectiveCamera
           makeDefault={false}
           far={100000}
@@ -55,7 +76,7 @@ export default function Mirror() {
             receiveShadow
             geometry={nodes.top_left_block.geometry}
             material={nodes.top_left_block.material}
-            position={[-2090.101, -580.972, 32.654]}
+            position={[-2090.101, -580.972, 0]}
             rotation={[-Math.PI / 2, -0.35, 0]}
           />
           <mesh
@@ -73,7 +94,7 @@ export default function Mirror() {
             receiveShadow
             geometry={nodes.top_right_block.geometry}
             material={nodes.top_right_block.material}
-            position={[2113.749, -587.366, 2.894]}
+            position={[2113.749, -587.366, 0]}
             rotation={[-Math.PI / 2, 0.38, 0]}
           />
         </group>
@@ -86,18 +107,47 @@ export default function Mirror() {
           position={[-11.785, 14.134, 84.895]}
           rotation={[0, 0, -Math.PI]}
           scale={[1, 1, 1.726]}
-        />
+        >
+          <LayerMaterial>
+            <Depth />
+            <Fresnel />
+            <Color />
+          </LayerMaterial>
+        </mesh>
         <group name="gem" position={[98.599, 3773.743, 218.1]}>
           <mesh
             name="gem_1"
             castShadow
             receiveShadow
             geometry={nodes.gem_1.geometry}
-            material={nodes.gem_1.material}
             position={[5.313, -27.229, 0]}
-            rotation={[0, 0, -Math.PI]}
+            rotation={[0, 0, 0]}
             scale={[1, 1, 2.515]}
-          />
+          >
+            <LayerMaterial
+              color={"#fff"}
+              lighting={"physical"} //
+              transmission={1}
+              roughness={0.1}
+              thickness={2}
+            >
+              <Depth
+                near={0.4854}
+                far={0.7661999999999932}
+                origin={[-0.4920000000000004, 0.4250000000000003, 0]}
+                colorA={"#fff"}
+                colorB={"#0c0333"}
+              />
+              <Fresnel
+                color={"#5836c7"}
+                bias={-0.3430000000000002}
+                intensity={3.8999999999999946}
+                power={3.3699999999999903}
+                factor={1.119999999999999}
+                mode={"screen"}
+              />
+            </LayerMaterial>
+          </mesh>
           <mesh
             name="gem_frame"
             castShadow
@@ -200,9 +250,25 @@ export default function Mirror() {
           receiveShadow
           geometry={nodes.glass.geometry}
           material={nodes.glass.material}
-          position={[-26.02, 53.54, -101.974]}
-          scale={[1, 1, 3.696]}
-        />
+          position={[-6.55, -23.68, -170.973]}
+          rotation={[0, 0, 0]}
+        >
+          <LayerMaterial color={"#fff"} lighting={"physical"}>
+            <Depth
+              near={2}
+              far={48}
+              origin={[0, 0, 0]}
+              colorA={"#4f187d"}
+              colorB={"#110730"}
+            />
+            <Displace
+              ref={displaceRef}
+              strength={0}
+              scale={1.5}
+              offset={[1.2, 0.5, 0.2]}
+            />
+          </LayerMaterial>
+        </mesh>
         <mesh
           name="frame"
           castShadow
