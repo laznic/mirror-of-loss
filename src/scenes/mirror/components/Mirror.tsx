@@ -7,6 +7,12 @@ export default function Mirror() {
   return (
     <group dispose={null}>
       <group scale={0.01}>
+        <directionalLight
+          name="Directional_Light"
+          intensity={1}
+          decay={2}
+          rotation={[0, 0, -0.139]}
+        />
         <PerspectiveCamera
           makeDefault={false}
           far={100000}
@@ -15,8 +21,9 @@ export default function Mirror() {
           position={[-1010.863, 5706.855, 35401.469]}
           rotation={[-0.232, 0.028, 0.007]}
         />
-        <group position={[21.251, 2198.83, -898.589]}>
+        <group name="Group" position={[21.251, 2198.83, -898.589]}>
           <mesh
+            name="spike_right"
             castShadow
             receiveShadow
             geometry={nodes.spike_right.geometry}
@@ -25,6 +32,7 @@ export default function Mirror() {
             rotation={[Math.PI, 0, -Math.PI]}
           />
           <mesh
+            name="spike_left"
             castShadow
             receiveShadow
             geometry={nodes.spike_left.geometry}
@@ -33,6 +41,7 @@ export default function Mirror() {
             rotation={[-Math.PI, 0, -Math.PI]}
           />
           <mesh
+            name="top_block"
             castShadow
             receiveShadow
             geometry={nodes.top_block.geometry}
@@ -41,6 +50,7 @@ export default function Mirror() {
             rotation={[-Math.PI / 2, 0, 0]}
           />
           <mesh
+            name="top_left_block"
             castShadow
             receiveShadow
             geometry={nodes.top_left_block.geometry}
@@ -49,6 +59,7 @@ export default function Mirror() {
             rotation={[-Math.PI / 2, -0.35, 0]}
           />
           <mesh
+            name="mid_spikes"
             castShadow
             receiveShadow
             geometry={nodes.mid_spikes.geometry}
@@ -57,6 +68,7 @@ export default function Mirror() {
             rotation={[-Math.PI / 2, -1.564, 0]}
           />
           <mesh
+            name="top_right_block"
             castShadow
             receiveShadow
             geometry={nodes.top_right_block.geometry}
@@ -66,6 +78,7 @@ export default function Mirror() {
           />
         </group>
         <mesh
+          name="frame_details"
           castShadow
           receiveShadow
           geometry={nodes.frame_details.geometry}
@@ -74,8 +87,9 @@ export default function Mirror() {
           rotation={[0, 0, -Math.PI]}
           scale={[1, 1, 1.726]}
         />
-        <group position={[98.599, 3773.743, 218.1]}>
+        <group name="gem" position={[98.599, 3773.743, 218.1]}>
           <mesh
+            name="gem_1"
             castShadow
             receiveShadow
             geometry={nodes.gem_1.geometry}
@@ -85,6 +99,7 @@ export default function Mirror() {
             scale={[1, 1, 2.515]}
           />
           <mesh
+            name="gem_frame"
             castShadow
             receiveShadow
             geometry={nodes.gem_frame.geometry}
@@ -94,8 +109,9 @@ export default function Mirror() {
             scale={0.735}
           />
         </group>
-        <group position={[72.356, -5546.331, 45.748]}>
+        <group name="Group_1" position={[72.356, -5546.331, 45.748]}>
           <mesh
+            name="bottom_pyramid"
             castShadow
             receiveShadow
             geometry={nodes.bottom_pyramid.geometry}
@@ -104,6 +120,7 @@ export default function Mirror() {
             rotation={[-0.406, Math.PI / 2, 0]}
           />
           <mesh
+            name="bottom_front"
             castShadow
             receiveShadow
             geometry={nodes.bottom_front.geometry}
@@ -112,8 +129,9 @@ export default function Mirror() {
             rotation={[Math.PI / 2, 0, 0]}
             scale={[1, 1.746, 1]}
           />
-          <group position={[1774.261, 284.942, -79.554]}>
+          <group name="bottom_right" position={[1774.261, 284.942, -79.554]}>
             <mesh
+              name="Cylinder_4"
               castShadow
               receiveShadow
               geometry={nodes.Cylinder_4.geometry}
@@ -123,6 +141,7 @@ export default function Mirror() {
               scale={[0.731, 1, 1]}
             />
             <mesh
+              name="Cylinder_2"
               castShadow
               receiveShadow
               geometry={nodes.Cylinder_2.geometry}
@@ -132,6 +151,7 @@ export default function Mirror() {
               scale={[0.731, 1, 1]}
             />
             <mesh
+              name="Cylinder_2_1"
               castShadow
               receiveShadow
               geometry={nodes.Cylinder_2_1.geometry}
@@ -141,8 +161,9 @@ export default function Mirror() {
               scale={[1, 0.317, 1]}
             />
           </group>
-          <group position={[-1793.822, 0, 0]}>
+          <group name="bottom_left" position={[-1793.822, 0, 0]}>
             <mesh
+              name="Cylinder_3"
               castShadow
               receiveShadow
               geometry={nodes.Cylinder_3.geometry}
@@ -152,6 +173,7 @@ export default function Mirror() {
               scale={[0.731, 1, 1]}
             />
             <mesh
+              name="Cylinder"
               castShadow
               receiveShadow
               geometry={nodes.Cylinder.geometry}
@@ -161,6 +183,7 @@ export default function Mirror() {
               scale={[0.731, 1, 1]}
             />
             <mesh
+              name="Cylinder_1"
               castShadow
               receiveShadow
               geometry={nodes.Cylinder_1.geometry}
@@ -172,6 +195,7 @@ export default function Mirror() {
           </group>
         </group>
         <mesh
+          name="glass"
           castShadow
           receiveShadow
           geometry={nodes.glass.geometry}
@@ -180,6 +204,7 @@ export default function Mirror() {
           scale={[1, 1, 3.696]}
         />
         <mesh
+          name="frame"
           castShadow
           receiveShadow
           geometry={nodes.frame.geometry}
