@@ -4,14 +4,15 @@
 
 import { corsHeaders } from "../_shared/cors.ts";
 import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
-// import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { base64 } from "https://cdn.jsdelivr.net/gh/hexagon/base64@1/src/base64.js";
 
 const openAI = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") });
 
-// const supabaseClient = createClient(
-//   Deno.env.get("SUPABASE_URL") ?? "",
-//   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-// );
+const supabaseClient = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -57,7 +58,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           style_preset: "fantasy-art",
-          samples: 6,
+          samples: 1,
           steps: 40,
           text_prompts: [
             {
@@ -71,7 +72,7 @@ Deno.serve(async (req) => {
               weight: -1,
             },
           ],
-          cfg_scale: 5,
+          cfg_scale: 16,
           sampler: "K_EULER_ANCESTRAL",
         }),
       }
@@ -84,9 +85,22 @@ Deno.serve(async (req) => {
   const jsonRes = await Promise.all(results.map((res) => res.json()));
 
   for (let i = 0; i < jsonRes.length; i++) {
-    const data = jsonRes[i];
+    const d = jsonRes[i];
 
-    images[i] = data.artifacts;
+    images[i] = d;
+
+    await supabaseClient.storage
+      .from("memories")
+      .upload(`public/${i}.webp`, base64.toArrayBuffer(d.artifacts[0].base64), {
+        contentType: "image/webp",
+      });
+
+    await supabaseClient.from("memories").insert({
+      image: Deno.env.get("DENO_DEPLOYMENT_ID")
+        ? Deno.env.get("SUPABASE_URL")
+        : "http://localhost:54321" +
+          `/storage/v1/object/public/memories/public/${i}.webp`,
+    });
   }
 
   return new Response(JSON.stringify({ data: { generatedPrompts, images } }), {
