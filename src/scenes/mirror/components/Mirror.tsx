@@ -3,7 +3,7 @@ import {
   PerspectiveCamera,
   MeshDistortMaterial,
 } from "@react-three/drei";
-import MirrorGLTF from "../../../assets/mirror_of_loss_2.gltf";
+import MirrorGLTF from "../../../assets/mirror_of_loss_6.gltf";
 import {
   Color,
   DebugLayerMaterial,
@@ -32,17 +32,9 @@ export default function Mirror() {
   });
 
   return (
-    <group dispose={null}>
-      <group scale={0.01}>
-        <PerspectiveCamera
-          makeDefault={false}
-          far={100000}
-          near={70}
-          fov={45}
-          position={[-1010.863, 5706.855, 35401.469]}
-          rotation={[-0.232, 0.028, 0.007]}
-        />
-        <group name="Group" position={[21.251, 2198.83, -898.589]}>
+    <group dispose={null} castShadow>
+      <group scale={0.01} castShadow>
+        <group name="Group" position={[21.251, 2198.83, -898.589]} castShadow>
           <mesh
             name="spike_right"
             castShadow
@@ -101,7 +93,6 @@ export default function Mirror() {
         <mesh
           name="frame_details"
           castShadow
-          receiveShadow
           geometry={nodes.frame_details.geometry}
           material={nodes.frame_details.material}
           position={[-11.785, 14.134, 84.895]}
@@ -109,9 +100,14 @@ export default function Mirror() {
           scale={[1, 1, 1.726]}
         >
           <LayerMaterial>
-            <Depth />
-            <Fresnel />
-            <Color />
+            <Depth
+              near={10}
+              far={100}
+              origin={[0, 0, 0]}
+              colorA={"#000"}
+              colorB={"#1a1024"}
+              mapping="camera"
+            />
           </LayerMaterial>
         </mesh>
         <group name="gem" position={[98.599, 3773.743, 218.1]}>
@@ -157,7 +153,17 @@ export default function Mirror() {
             position={[0, 0, -53.11]}
             rotation={[-Math.PI / 2, -Math.PI / 2, 0]}
             scale={0.735}
-          />
+          >
+            <LayerMaterial color="#271c33" lighting="phong">
+              <Depth
+                near={1}
+                far={25}
+                origin={[5, 0, 2]}
+                colorA={"#79708a"}
+                colorB={"#352b40"}
+              />
+            </LayerMaterial>
+          </mesh>
         </group>
         <group name="Group_1" position={[72.356, -5546.331, 45.748]}>
           <mesh
@@ -168,7 +174,14 @@ export default function Mirror() {
             material={nodes.bottom_pyramid.material}
             position={[-61.983, 611.423, 493.79]}
             rotation={[-0.406, Math.PI / 2, 0]}
-          />
+          >
+            <meshPhysicalMaterial
+              ior={0.1}
+              clearcoat={5}
+              color={"#c4b48b"}
+              reflectivity={0.5}
+            />
+          </mesh>
           <mesh
             name="bottom_front"
             castShadow
@@ -178,7 +191,14 @@ export default function Mirror() {
             position={[0, -739.175, -462.332]}
             rotation={[Math.PI / 2, 0, 0]}
             scale={[1, 1.746, 1]}
-          />
+          >
+            <meshPhysicalMaterial
+              ior={0.1}
+              clearcoat={5}
+              color={"#c4b48b"}
+              reflectivity={0.5}
+            />
+          </mesh>
           <group name="bottom_right" position={[1774.261, 284.942, -79.554]}>
             <mesh
               name="Cylinder_4"
@@ -189,7 +209,14 @@ export default function Mirror() {
               position={[-386.52, -759.198, 0]}
               rotation={[0.061, 0.366, 1.402]}
               scale={[0.731, 1, 1]}
-            />
+            >
+              <meshPhysicalMaterial
+                ior={0.1}
+                clearcoat={5}
+                color={"#c4b48b"}
+                reflectivity={0.5}
+              />
+            </mesh>
             <mesh
               name="Cylinder_2"
               castShadow
@@ -199,7 +226,14 @@ export default function Mirror() {
               position={[-352.444, -544.078, 0]}
               rotation={[Math.PI / 2, 1.414, 0]}
               scale={[0.731, 1, 1]}
-            />
+            >
+              <meshPhysicalMaterial
+                ior={0.1}
+                clearcoat={5}
+                color={"#c4b48b"}
+                reflectivity={0.5}
+              />
+            </mesh>
             <mesh
               name="Cylinder_2_1"
               castShadow
@@ -209,7 +243,14 @@ export default function Mirror() {
               position={[1113.05, 1529.206, -9.116]}
               rotation={[Math.PI / 2, 0, 0]}
               scale={[1, 0.317, 1]}
-            />
+            >
+              <meshPhysicalMaterial
+                ior={0.1}
+                clearcoat={5}
+                color={"#c4b48b"}
+                reflectivity={0.5}
+              />
+            </mesh>
           </group>
           <group name="bottom_left" position={[-1793.822, 0, 0]}>
             <mesh
@@ -221,7 +262,14 @@ export default function Mirror() {
               position={[200.091, -537.78, 0]}
               rotation={[-0.041, -0.255, 1.675]}
               scale={[0.731, 1, 1]}
-            />
+            >
+              <meshPhysicalMaterial
+                ior={0.1}
+                clearcoat={5}
+                color={"#c4b48b"}
+                reflectivity={0.5}
+              />
+            </mesh>
             <mesh
               name="Cylinder"
               castShadow
@@ -231,7 +279,14 @@ export default function Mirror() {
               position={[125.409, -428.562, -79.554]}
               rotation={[-Math.PI / 2, 0.559, -Math.PI]}
               scale={[0.731, 1, 1]}
-            />
+            >
+              <meshPhysicalMaterial
+                ior={0.1}
+                clearcoat={5}
+                color={"#c4b48b"}
+                reflectivity={0.5}
+              />
+            </mesh>
             <mesh
               name="Cylinder_1"
               castShadow
@@ -241,7 +296,14 @@ export default function Mirror() {
               position={[-1133.769, 1829.147, -96.67]}
               rotation={[Math.PI / 2, 0, 0]}
               scale={[1, 0.317, 1]}
-            />
+            >
+              <meshPhysicalMaterial
+                ior={0.1}
+                clearcoat={5}
+                color={"#c4b48b"}
+                reflectivity={0.5}
+              />
+            </mesh>
           </group>
         </group>
         <mesh
@@ -277,7 +339,18 @@ export default function Mirror() {
           material={nodes.frame.material}
           rotation={[Math.PI / 2, 0, Math.PI]}
           scale={[1, 6.915, 1]}
-        />
+        >
+          <LayerMaterial color="#271c33" lighting="phong">
+            <Depth
+              near={10}
+              far={300}
+              origin={[0, 0, 0]}
+              colorA={"#8b8499"}
+              colorB={"#483d54"}
+              mapping="camera"
+            />
+          </LayerMaterial>
+        </mesh>
       </group>
     </group>
   );
