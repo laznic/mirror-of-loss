@@ -18,7 +18,6 @@ import {
   useTexture,
 } from "@react-three/drei";
 import pillar from "./assets/pillar.png";
-import mirror from "./assets/mirror.png";
 import brazier from "./assets/brazier-animated.png";
 import { useRef } from "react";
 
@@ -29,13 +28,12 @@ function App() {
       shadows
       style={{ width: "100%", height: "100%" }}
     >
-      <OrbitControls minPolarAngle={0} maxPolarAngle={Math.PI / 2} />
       <ambientLight />
-      <color attach={"background"} args={["#8a82a1"]} />
+      <color attach={"background"} args={["#000"]} />
       <fog color="#000" attach="fog" near={50} far={700} />
       <directionalLight intensity={5} color={"#fff"} position={[-3, 1.5, 3]} />
-      {/* <CameraControls /> */}
-      <MirrorSimple />
+      <CameraControls />
+      <Mirror />
       <Pillar position={[-100, 0, 0]} />
       <Pillar position={[-100, 0, 100]} />
       <Pillar position={[-100, 0, 200]} />
@@ -44,7 +42,6 @@ function App() {
       <Pillar position={[100, 0, 200]} />
       <Brazier position={[-50, -65, 0]} />
       <Brazier position={[50, -65, 0]} />
-      <Environment preset="city" />
       {/* <Caustics /> */}
       {/* <AccumulativeShadows>
         <RandomizedLight />
@@ -81,18 +78,6 @@ function App() {
   );
 }
 
-function MirrorSimple() {
-  const texture = useTexture(mirror);
-
-  return (
-    <Billboard>
-      <Circle args={[75, 75]} position={[0, 0, 0]}>
-        <MeshReflectorMaterial map={texture} mirror={0.1} alphaTest={0.5} />
-      </Circle>
-    </Billboard>
-  );
-}
-
 function Brazier({ position }) {
   const texture = useTexture(brazier);
   const offset = useRef(0);
@@ -124,11 +109,11 @@ function Pillar({ position }) {
   const texture = useTexture(pillar);
 
   return (
-    <Billboard>
-      <Box args={[25, 175, 15]} position={position}>
-        <meshLambertMaterial map={texture} alphaTest={0} />
-      </Box>
-    </Billboard>
+    // <Billboard>
+    <Box args={[25, 175, 25]} position={position}>
+      <meshLambertMaterial map={texture} alphaTest={0} />
+    </Box>
+    // </Billboard>
   );
 }
 
