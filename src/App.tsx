@@ -18,6 +18,7 @@ import pillar from "./assets/pillar.png";
 import brazier from "./assets/brazier-animated.png";
 import { useEffect, useRef, useState } from "react";
 import supabase from "./supabase";
+import { MathUtils } from "three";
 
 function App() {
   return (
@@ -141,48 +142,47 @@ function MemoryBlobs() {
     };
   }, []);
 
-  return (
-    <>
-      <Blob
-        position={[0, 0, 20]}
-        imageUrl={memories[0]?.image}
-        key={"blob-1"}
-        visible={memories.length > 0}
-      />
-      <Blob
-        position={[0, 10, 40]}
-        imageUrl={memories[1]?.image}
-        key={"blob-2"}
-        visible={memories.length > 1}
-      />
-      <Blob
-        position={[0, 20, 60]}
-        imageUrl={memories[2]?.image}
-        key={"blob-3"}
-        visible={memories.length > 2}
-      />
-      <Blob
-        position={[0, 30, 80]}
-        imageUrl={memories[3]?.image}
-        key={"blob-4"}
-        visible={memories.length > 3}
-      />
-    </>
-  );
+  return memories.map((memory) => (
+    <Blob
+      key={memory.id}
+      position={[0, 0, 80]}
+      imageUrl={memory.image}
+      visible
+    />
+  ));
 }
 
-function Blob({ imageUrl, position, visible }) {
+function Blob({ imageUrl, position, visible = true }) {
   const texture = useTexture(imageUrl ?? {});
   const groupRef = useRef();
 
   useFrame(() => {
     if (!visible) return;
-    if (groupRef.current.position.z <= -25) return;
+    if (groupRef.current.position.z <= -30) return;
 
-    groupRef.current.position.z -= 0.1;
-    groupRef.current.scale.x -= 0.001;
-    groupRef.current.scale.y -= 0.001;
-    groupRef.current.scale.z -= 0.001;
+    groupRef.current.position.z = MathUtils.lerp(
+      groupRef.current.position.z,
+      -30,
+      0.002
+    );
+
+    groupRef.curre;
+
+    groupRef.current.scale.x = MathUtils.lerp(
+      groupRef.current.scale.x,
+      0,
+      0.0005
+    );
+    groupRef.current.scale.y = MathUtils.lerp(
+      groupRef.current.scale.y,
+      0,
+      0.0005
+    );
+    groupRef.current.scale.z = MathUtils.lerp(
+      groupRef.current.scale.z,
+      0,
+      0.0005
+    );
   });
 
   return (
