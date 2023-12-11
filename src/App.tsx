@@ -7,8 +7,8 @@ import {
   Box,
   CameraControls,
   Float,
-  MeshDistortMaterial,
   MeshReflectorMaterial,
+  MeshTransmissionMaterial,
   Plane,
   RandomizedLight,
   Sphere,
@@ -16,9 +16,8 @@ import {
 } from "@react-three/drei";
 import pillar from "./assets/pillar.png";
 import brazier from "./assets/brazier-animated.png";
-import { useRef } from "react";
-import { Depth, Displace, Fresnel, LayerMaterial, Texture } from "lamina";
-import { MathUtils } from "three";
+import { useEffect, useRef, useState } from "react";
+import supabase from "./supabase";
 
 function App() {
   return (
@@ -39,7 +38,7 @@ function App() {
         <CameraControls />
         <Mirror />
 
-        <Blob />
+        <MemoryBlobs />
 
         <Pillar position={[-100, 0, 0]} />
         <Pillar position={[-100, 0, 100]} />
@@ -122,54 +121,94 @@ function Pillar({ position }) {
   );
 }
 
-function Blob() {
-  const texture = useTexture(
-    "http://localhost:54321/storage/v1/object/public/memories/public/2.webp"
+function MemoryBlobs() {
+  const [memories, setMemories] = useState([]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("memories")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "memories" },
+        (payload) => {
+          setMemories((prev) => prev.concat([payload.new]));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <>
+      <Blob
+        position={[0, 0, 20]}
+        imageUrl={memories[0]?.image}
+        key={"blob-1"}
+        visible={memories.length > 0}
+      />
+      <Blob
+        position={[0, 10, 40]}
+        imageUrl={memories[1]?.image}
+        key={"blob-2"}
+        visible={memories.length > 1}
+      />
+      <Blob
+        position={[0, 20, 60]}
+        imageUrl={memories[2]?.image}
+        key={"blob-3"}
+        visible={memories.length > 2}
+      />
+      <Blob
+        position={[0, 30, 80]}
+        imageUrl={memories[3]?.image}
+        key={"blob-4"}
+        visible={memories.length > 3}
+      />
+    </>
   );
+}
 
-  const displaceRef = useRef();
+function Blob({ imageUrl, position, visible }) {
+  const texture = useTexture(imageUrl ?? {});
+  const groupRef = useRef();
 
-  useFrame((state, delta) => {
-    displaceRef.current.offset.x += 0.3 * delta;
-    displaceRef.current.offset.y += 0.1 * delta;
-    displaceRef.current.offset.z += 0.3 * delta;
-    displaceRef.current.strength = Math.sin(state.clock.getElapsedTime()) * 5;
+  useFrame(() => {
+    if (!visible) return;
+    if (groupRef.current.position.z <= -25) return;
+
+    groupRef.current.position.z -= 0.1;
+    groupRef.current.scale.x -= 0.001;
+    groupRef.current.scale.y -= 0.001;
+    groupRef.current.scale.z -= 0.001;
   });
 
   return (
-    <Float speed={2} rotationIntensity={2} floatIntensity={5}>
-      <Sphere args={[25, 28, 16]} position={[0, 0, 20]} castShadow>
-        <LayerMaterial
-          color={"#fff"}
-          lighting={"physical"}
-          transmission={0.75}
-          roughness={0.05}
-          thickness={5}
-        >
-          <Texture map={texture} />
+    <group visible={visible}>
+      <Float speed={5} rotationIntensity={2} floatIntensity={5}>
+        <group position={position} ref={groupRef}>
+          <Sphere args={[13.5, 48, 48]} castShadow>
+            <MeshTransmissionMaterial
+              distortionScale={0.1}
+              temporalDistortion={1}
+              transmission={0.95}
+              color={"#fbd9ff"}
+              roughness={0}
+              thickness={0.9}
+              chromaticAberration={0.4}
+              anisotropicBlur={5}
+              distortion={1}
+            />
+          </Sphere>
 
-          <Displace ref={displaceRef} strength={5} offset={[4, 5, 5]} />
-          <Depth
-            near={0.49}
-            far={0.75}
-            origin={[-0.5, 0.4, 0]}
-            colorA={"#fff"}
-            colorB={"#000"}
-            mode={"screen"}
-            alpha={0.9}
-          />
-
-          <Fresnel
-            color={"#b1d7fc"}
-            bias={0}
-            intensity={3.25}
-            power={Math.PI}
-            factor={1.2}
-            mode={"screen"}
-          />
-        </LayerMaterial>
-      </Sphere>
-    </Float>
+          <Sphere args={[10, 48, 48]}>
+            <meshPhysicalMaterial map={texture} roughness={0.1} />
+          </Sphere>
+        </group>
+      </Float>
+    </group>
   );
 }
 
