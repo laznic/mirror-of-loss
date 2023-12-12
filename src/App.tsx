@@ -3,61 +3,55 @@ import "./App.css";
 import {
   AccumulativeShadows,
   CameraControls,
+  KeyboardControls,
   Plane,
   RandomizedLight,
 } from "@react-three/drei";
 
 import { MirrorScene } from "./scenes/mirror";
+import VoidScene from "./scenes/void";
 
 function App() {
   return (
     <>
-      <Canvas
-        camera={{ position: [0, 0.5, 20], fov: 90 }}
-        shadows
-        style={{ width: "100%", height: "100%" }}
+      <KeyboardControls
+        map={[
+          { name: "forward", keys: ["ArrowUp", "w", "W"] },
+          { name: "backward", keys: ["ArrowDown", "s", "S"] },
+          { name: "left", keys: ["ArrowLeft", "a", "A"] },
+          { name: "right", keys: ["ArrowRight", "d", "D"] },
+          { name: "jump", keys: ["Space"] },
+          { name: "crouch", keys: ["ControlLeft", "ControlRight", "c", "C"] },
+        ]}
       >
-        <ambientLight />
-        <color attach={"background"} args={["#000"]} />
-        <fog color="#000" attach="fog" near={50} far={700} />
-        <directionalLight
-          intensity={5}
-          color={"#fff"}
-          position={[-3, 1.5, 3]}
-        />
-        <CameraControls />
-
-        <MirrorScene />
-
-        <AccumulativeShadows
-          temporal
-          frames={100}
-          color="#666"
-          colorBlend={2}
-          toneMapped={true}
-          alphaTest={0.75}
-          opacity={2}
-          scale={200}
-          position={[0, -100, 0]}
+        <Canvas
+          camera={{ position: [0, 0.5, 20], fov: 90 }}
+          shadows
+          style={{ width: "100%", height: "100%" }}
         >
-          <RandomizedLight
-            intensity={Math.PI}
-            amount={8}
-            radius={10}
-            ambient={0.5}
-            position={[5, 5, -10]}
-            bias={0.001}
+          <ambientLight />
+          <color attach={"background"} args={["#000"]} />
+          <fog color="#000" attach="fog" near={50} far={700} />
+          <directionalLight
+            intensity={5}
+            color={"#fff"}
+            position={[-3, 1.5, 3]}
           />
-        </AccumulativeShadows>
-        <Plane
-          receiveShadow
-          args={[1000, 1000]}
-          rotation={[4.737, 0, 0]}
-          position={[0, -100, 300]}
-        >
-          <meshPhongMaterial color={"#8a82a1"} />
-        </Plane>
-      </Canvas>
+
+          {/* <CameraControls /> */}
+          <VoidScene />
+          <MirrorScene />
+
+          <Plane
+            receiveShadow
+            args={[1000, 1000]}
+            rotation={[4.737, 0, 0]}
+            position={[0, -100, 300]}
+          >
+            <meshPhongMaterial color={"#8a82a1"} />
+          </Plane>
+        </Canvas>
+      </KeyboardControls>
     </>
   );
 }

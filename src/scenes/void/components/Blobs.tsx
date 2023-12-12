@@ -3,36 +3,21 @@ import supabase from "../../../supabase";
 import {
   Float,
   MeshTransmissionMaterial,
+  Plane,
   Sphere,
+  useKeyboardControls,
   useTexture,
 } from "@react-three/drei";
 import { useFrame, useThree, extend } from "@react-three/fiber";
-import { Group, Vector3Tuple } from "three";
+import { Group, Vector3Tuple, Vector3, DoubleSide } from "three";
 import { useSpring, animated, config } from "@react-spring/three";
 import * as THREE from "three";
 import CameraControls from "camera-controls";
-import * as holdEvent from "hold-event";
 
 CameraControls.install({ THREE });
 extend({ CameraControls });
 
-const KEYCODE = {
-  W: "KeyW",
-  A: "KeyA",
-  S: "KeyS",
-  D: "KeyD",
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_UP: "ArrowUp",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
-};
-
-const wKey = new holdEvent.KeyboardKeyHold(KEYCODE.W);
-const aKey = new holdEvent.KeyboardKeyHold(KEYCODE.A);
-const sKey = new holdEvent.KeyboardKeyHold(KEYCODE.S);
-const dKey = new holdEvent.KeyboardKeyHold(KEYCODE.D);
-
-function Controls({ pos = new THREE.Vector3(), look = new THREE.Vector3() }) {
+function Controls({ pos = new Vector3(), look = new Vector3() }) {
   const camera = useThree((state) => state.camera);
   const gl = useThree((state) => state.gl);
   const controls = useMemo(() => new CameraControls(camera, gl.domElement), []);
@@ -40,36 +25,39 @@ function Controls({ pos = new THREE.Vector3(), look = new THREE.Vector3() }) {
   const currentPos = useRef(pos);
   shouldUpdate.current = !pos.equals(currentPos.current);
   currentPos.current = pos;
+  const [, get] = useKeyboardControls();
 
   useEffect(() => {
     controls.infinityDolly = true;
-
-    function truckCamera(direction) {
-      return (event) => {
-        controls.truck(0.25 * direction * event.deltaTime, 0, false);
-      };
-    }
-
-    function forwardCamera(direction) {
-      return (event) => {
-        controls.forward(0.25 * direction * event.deltaTime, 0, false);
-      };
-    }
-
-    aKey.addEventListener("holding", truckCamera(-1));
-    dKey.addEventListener("holding", truckCamera(1));
-    wKey.addEventListener("holding", forwardCamera(1));
-    sKey.addEventListener("holding", forwardCamera(-1));
-
-    return () => {
-      aKey.removeEventListener("holding", truckCamera(-1));
-      dKey.removeEventListener("holding", truckCamera(1));
-      wKey.removeEventListener("holding", forwardCamera(1));
-      sKey.removeEventListener("holding", forwardCamera(-1));
-    };
   }, []);
 
   useFrame((state, delta) => {
+    const { forward, backward, left, right, jump, crouch } = get();
+
+    if (forward) {
+      controls.forward(200 * delta, true);
+    }
+
+    if (backward) {
+      controls.forward(-200 * delta, true);
+    }
+
+    if (left) {
+      controls.truck(-200 * delta, 0, true);
+    }
+
+    if (right) {
+      controls.truck(200 * delta, 0, true);
+    }
+
+    if (jump) {
+      controls.elevate(200 * delta, true);
+    }
+
+    if (crouch) {
+      controls.elevate(-200 * delta, true);
+    }
+
     if (shouldUpdate.current) {
       state.camera.position.lerp(pos, 0.75);
       state.camera.updateProjectionMatrix();
@@ -101,7 +89,7 @@ export default function Blobs() {
   const [lookAt, setLookAt] = useState();
 
   function onClick(blob) {
-    setCamPos(new THREE.Vector3(0, blob.position.y, 150));
+    setCamPos(new Vector3(0, blob.position.y, 150));
     setLookAt(blob.position);
   }
 
@@ -158,12 +146,37 @@ function Blob({ imageUrl, position, visible, onClick }: BlobProps) {
   const texture = useTexture(imageUrl);
   const groupRef = useRef<Group>(null);
   const floatRef = useRef<Group>(null);
+  const planeRef =
+    useRef<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>>(
+      null
+    );
   const [hovering, setHovering] = useState(false);
+  const [showImage, setShowImage] = useState(false);
 
   useFrame(() => {
     if (!visible) return;
     if (!groupRef.current) return;
     if (!floatRef.current) return;
+
+    if (showImage) {
+      planeRef.current.position.x = THREE.MathUtils.lerp(
+        planeRef.current.position.x,
+        groupRef.current.position.x + 100,
+        0.01
+      );
+
+      planeRef.current.position.y = THREE.MathUtils.lerp(
+        planeRef.current.position.y,
+        groupRef.current.position.y,
+        0.01
+      );
+
+      planeRef.current.position.z = THREE.MathUtils.lerp(
+        planeRef.current.position.z,
+        groupRef.current.position.z,
+        0.01
+      );
+    }
   });
 
   const { scale } = useSpring({
@@ -174,9 +187,10 @@ function Blob({ imageUrl, position, visible, onClick }: BlobProps) {
   return (
     <>
       {/* <Billboard> */}
-      {/* <Plane args={[100, 100]} position={position}>
+
+      <Plane ref={planeRef} args={[100, 100]} visible={showImage}>
         <meshLambertMaterial map={texture} side={DoubleSide} />
-      </Plane> */}
+      </Plane>
       {/* </Billboard> */}
       <Float
         ref={floatRef}
@@ -187,6 +201,7 @@ function Blob({ imageUrl, position, visible, onClick }: BlobProps) {
         <group
           position={position}
           ref={groupRef}
+          onDoubleClick={() => setShowImage(true)}
           onClick={() => onClick(groupRef.current)}
           onPointerEnter={() => setHovering(true)}
           onPointerLeave={() => setHovering(false)}
