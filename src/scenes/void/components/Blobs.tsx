@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import supabase from "../../../supabase";
 import {
   Box,
@@ -6,86 +6,13 @@ import {
   MeshTransmissionMaterial,
   Plane,
   Sphere,
-  useKeyboardControls,
   useTexture,
 } from "@react-three/drei";
-import { useFrame, useThree, extend } from "@react-three/fiber";
-import { Group, Vector3Tuple, Vector3, DoubleSide } from "three";
+
 import { useSpring, animated, config } from "@react-spring/three";
-import * as THREE from "three";
-import CameraControls from "camera-controls";
-
-CameraControls.install({ THREE });
-extend({ CameraControls });
-
-function Controls({ pos = new Vector3(), look = new Vector3() }) {
-  const camera = useThree((state) => state.camera);
-  const gl = useThree((state) => state.gl);
-  const [, get] = useKeyboardControls();
-
-  const controls = useMemo(() => {
-    const cc = new CameraControls(camera, gl.domElement);
-    cc.dollyToCursor = true;
-    cc.maxDistance = 500;
-    return cc;
-  }, []);
-
-  const shouldUpdate = useRef(false);
-  const currentPos = useRef(pos);
-
-  shouldUpdate.current = !pos.equals(currentPos.current);
-  currentPos.current = pos;
-
-  useFrame((state, delta) => {
-    const { forward, backward, left, right, jump, crouch } = get();
-
-    if (forward) {
-      controls.forward(50 * delta, true);
-    }
-
-    if (backward) {
-      controls.forward(-50 * delta, true);
-    }
-
-    if (left) {
-      controls.truck(-50 * delta, 0, true);
-    }
-
-    if (right) {
-      controls.truck(50 * delta, 0, true);
-    }
-
-    if (jump) {
-      controls.elevate(50 * delta, true);
-    }
-
-    if (crouch) {
-      controls.elevate(-50 * delta, true);
-    }
-
-    if (shouldUpdate.current) {
-      state.camera.position.lerp(pos, 0.75);
-      state.camera.updateProjectionMatrix();
-      controls.setLookAt(
-        state.camera.position.x,
-        state.camera.position.y,
-        state.camera.position.z,
-        look.x,
-        look.y,
-        look.z,
-        true
-      );
-    }
-
-    controls.update(delta);
-
-    if (!controls.active && shouldUpdate.current) {
-      shouldUpdate.current = false;
-    }
-  });
-
-  return null;
-}
+import { DoubleSide, Group, MathUtils, Vector3, Vector3Tuple } from "three";
+import { useFrame } from "@react-three/fiber";
+import { useCameraContext } from "../context/CameraContext";
 
 interface BlobsProps {
   visible: boolean;
@@ -94,9 +21,8 @@ interface BlobsProps {
 
 export default function Blobs({ visible, groupId }: BlobsProps) {
   const [memories, setMemories] = useState([]);
-  const [camPos, setCamPos] = useState();
-  const [lookAt, setLookAt] = useState();
   const [showVideo, setShowVideo] = useState<number | null>(null);
+  const { setCamPos, setLookAt } = useCameraContext();
 
   function onClick(memoryId: number, blob: Group, plane: Group) {
     const newPosition = new Vector3(
@@ -130,9 +56,10 @@ export default function Blobs({ visible, groupId }: BlobsProps) {
     fetchMemories();
   }, [visible, groupId]);
 
+  if (!visible) return null;
+
   return (
     <>
-      <Controls pos={camPos} look={lookAt} />
       <group>
         {memories.map(
           (memory: { id: number; image: string }, index: number) => (
@@ -164,16 +91,16 @@ interface BlobProps {
 function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
   const texture = useTexture(imageUrl);
 
-  const [video] = useState(() => {
-    const vid = document.createElement("video");
-    vid.src =
-      "https://replicate.delivery/pbxt/aPTXL6n2ZYqgFVNgT5OP7NdLsNVPh5PS7Ee5b0g3EHhnmpAJA/000087.mp4";
-    vid.crossOrigin = "Anonymous";
-    vid.loop = true;
-    vid.muted = true;
-    vid.play();
-    return vid;
-  });
+  // const [video] = useState(() => {
+  //   const vid = document.createElement("video");
+  //   vid.src =
+  //     "https://replicate.delivery/pbxt/aPTXL6n2ZYqgFVNgT5OP7NdLsNVPh5PS7Ee5b0g3EHhnmpAJA/000087.mp4";
+  //   vid.crossOrigin = "Anonymous";
+  //   vid.loop = true;
+  //   vid.muted = true;
+  //   vid.play();
+  //   return vid;
+  // });
 
   const groupRef = useRef<Group>(null);
   const floatRef = useRef<Group>(null);
@@ -187,19 +114,19 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
     if (!planeRef.current) return;
 
     if (showVideo) {
-      planeRef.current.position.x = THREE.MathUtils.lerp(
+      planeRef.current.position.x = MathUtils.lerp(
         planeRef.current.position.x,
         groupRef.current.position.x,
         0.01
       );
 
-      planeRef.current.position.y = THREE.MathUtils.lerp(
+      planeRef.current.position.y = MathUtils.lerp(
         planeRef.current.position.y,
         groupRef.current.position.y + 9,
         0.01
       );
 
-      planeRef.current.position.z = THREE.MathUtils.lerp(
+      planeRef.current.position.z = MathUtils.lerp(
         planeRef.current.position.z,
         groupRef.current.position.z,
         0.01
@@ -212,9 +139,11 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
     config: config.wobbly,
   });
 
+  if (!visible) return null;
+
   return (
     <>
-      <group ref={planeRef} visible={showVideo} position={position}>
+      {/* <group ref={planeRef} visible={showVideo} position={position}>
         <Box args={[10, 10]}>
           <MeshTransmissionMaterial
             distortionScale={0.1}
@@ -231,7 +160,7 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
             <videoTexture attach={"map"} args={[video]} />
           </meshLambertMaterial>
         </Plane>
-      </group>
+      </group> */}
 
       <Float
         ref={floatRef}
