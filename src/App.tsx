@@ -2,7 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import "./App.css";
 import { KeyboardControls } from "@react-three/drei";
 
-// import { MirrorScene } from "./scenes/mirror";
+import { MirrorScene } from "./scenes/mirror";
 import VoidScene from "./scenes/void";
 import { useEffect } from "react";
 
@@ -22,7 +22,7 @@ function App() {
           { name: "left", keys: ["ArrowLeft", "a", "A"] },
           { name: "right", keys: ["ArrowRight", "d", "D"] },
           { name: "jump", keys: ["Space"] },
-          { name: "crouch", keys: ["ControlLeft", "ControlRight", "c", "C"] },
+          { name: "crouch", keys: ["c", "C"] },
         ]}
       >
         <Canvas
@@ -39,8 +39,8 @@ function App() {
             position={[-3, 1.5, 3]}
           />
 
-          <VoidScene />
-          {/* <MirrorScene /> */}
+          {/* <VoidScene /> */}
+          <MirrorScene />
         </Canvas>
       </KeyboardControls>
     </>
