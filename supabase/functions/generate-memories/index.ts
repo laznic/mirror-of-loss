@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  const { input } = await req.json();
+  const { input, playerId } = await req.json();
 
   const chatCompletion = await openAI.chat.completions.create({
     messages: [
@@ -39,7 +39,6 @@ Deno.serve(async (req) => {
   const generatedPrompts =
     chatCompletion.choices[0].message.content.split("\n");
 
-  const images = {};
   const promises = [];
 
   for (let i = 0; i < generatedPrompts.length; i++) {
@@ -84,10 +83,13 @@ Deno.serve(async (req) => {
   const results = await Promise.all(promises);
   const jsonRes = await Promise.all(results.map((res) => res.json()));
 
+  const { data: memoryGroupId } = await supabaseClient.rpc(
+    "insert_memory_group",
+    { memory: input }
+  );
+
   for (let i = 0; i < jsonRes.length; i++) {
     const d = jsonRes[i];
-
-    images[i] = d;
 
     await supabaseClient.storage
       .from("memories")
@@ -96,6 +98,8 @@ Deno.serve(async (req) => {
       });
 
     await supabaseClient.from("memories").insert({
+      group_id: memoryGroupId,
+      player_id: playerId,
       image: Deno.env.get("DENO_DEPLOYMENT_ID")
         ? Deno.env.get("SUPABASE_URL")
         : "http://localhost:54321" +
@@ -103,19 +107,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ data: { generatedPrompts, images } }), {
+  return new Response("ok", {
     headers: { "Content-Type": "application/json", ...corsHeaders },
   });
 });
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/generate-memories' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
