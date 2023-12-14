@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import supabase from "../../../supabase";
 import {
+  Box,
   Float,
   MeshTransmissionMaterial,
   Plane,
@@ -20,42 +21,46 @@ extend({ CameraControls });
 function Controls({ pos = new Vector3(), look = new Vector3() }) {
   const camera = useThree((state) => state.camera);
   const gl = useThree((state) => state.gl);
-  const controls = useMemo(() => new CameraControls(camera, gl.domElement), []);
-  const shouldUpdate = useRef(false);
-  const currentPos = useRef(pos);
-  shouldUpdate.current = !pos.equals(currentPos.current);
-  currentPos.current = pos;
   const [, get] = useKeyboardControls();
 
-  useEffect(() => {
-    controls.infinityDolly = true;
+  const controls = useMemo(() => {
+    const cc = new CameraControls(camera, gl.domElement);
+    cc.dollyToCursor = true;
+    cc.maxDistance = 500;
+    return cc;
   }, []);
+
+  const shouldUpdate = useRef(false);
+  const currentPos = useRef(pos);
+
+  shouldUpdate.current = !pos.equals(currentPos.current);
+  currentPos.current = pos;
 
   useFrame((state, delta) => {
     const { forward, backward, left, right, jump, crouch } = get();
 
     if (forward) {
-      controls.forward(200 * delta, true);
+      controls.forward(50 * delta, true);
     }
 
     if (backward) {
-      controls.forward(-200 * delta, true);
+      controls.forward(-50 * delta, true);
     }
 
     if (left) {
-      controls.truck(-200 * delta, 0, true);
+      controls.truck(-50 * delta, 0, true);
     }
 
     if (right) {
-      controls.truck(200 * delta, 0, true);
+      controls.truck(50 * delta, 0, true);
     }
 
     if (jump) {
-      controls.elevate(200 * delta, true);
+      controls.elevate(50 * delta, true);
     }
 
     if (crouch) {
-      controls.elevate(-200 * delta, true);
+      controls.elevate(-50 * delta, true);
     }
 
     if (shouldUpdate.current) {
@@ -82,20 +87,34 @@ function Controls({ pos = new Vector3(), look = new Vector3() }) {
   return null;
 }
 
-export default function Blobs() {
+interface BlobsProps {
+  visible: boolean;
+}
+
+export default function Blobs({ visible }: BlobsProps) {
   const [memories, setMemories] = useState([]);
-  const groupRef = useRef<Group>(null);
   const [camPos, setCamPos] = useState();
   const [lookAt, setLookAt] = useState();
+  const [showVideo, setShowVideo] = useState<number | null>(null);
 
-  function onClick(blob) {
-    setCamPos(new Vector3(0, blob.position.y, 150));
-    setLookAt(blob.position);
+  function onClick(memoryId: number, blob: Group, plane: Group) {
+    const newPosition = new Vector3(
+      blob.position.x,
+      blob.position.y + 9,
+      blob.position.z + 10
+    );
+
+    setCamPos(newPosition);
+    setLookAt(plane.position);
+
+    setShowVideo(memoryId);
   }
 
   useEffect(() => {
+    if (!visible) return;
+
     async function fetchMemories() {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("memories")
         .select()
         .order("id", { ascending: false })
@@ -107,26 +126,22 @@ export default function Blobs() {
     }
 
     fetchMemories();
-  }, []);
-
-  useFrame(({ camera }) => {
-    if (!groupRef.current) return;
-
-    // state.camera.lookAt([0, 40, 80]);
-    // state.camera.updateProjectionMatrix();
-  });
+  }, [visible]);
 
   return (
     <>
       <Controls pos={camPos} look={lookAt} />
-      <group ref={groupRef}>
+      <group>
         {memories.map(
           (memory: { id: number; image: string }, index: number) => (
             <Blob
               key={memory.id}
-              position={[0, 40 * index, 80]}
+              position={[index * 5 - 7.5, 5, 0]}
               imageUrl={memory.image}
-              onClick={onClick}
+              onClick={(blobRef, planeRef) =>
+                onClick(memory.id, blobRef, planeRef)
+              }
+              showVideo={showVideo === memory.id}
               visible
             />
           )
@@ -140,34 +155,45 @@ interface BlobProps {
   imageUrl: string;
   position: Vector3Tuple;
   visible: boolean;
+  onClick: (blobRef: Group) => void;
+  showVideo: boolean;
 }
 
-function Blob({ imageUrl, position, visible, onClick }: BlobProps) {
+function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
   const texture = useTexture(imageUrl);
+
+  const [video] = useState(() => {
+    const vid = document.createElement("video");
+    vid.src =
+      "https://replicate.delivery/pbxt/aPTXL6n2ZYqgFVNgT5OP7NdLsNVPh5PS7Ee5b0g3EHhnmpAJA/000087.mp4";
+    vid.crossOrigin = "Anonymous";
+    vid.loop = true;
+    vid.muted = true;
+    vid.play();
+    return vid;
+  });
+
   const groupRef = useRef<Group>(null);
   const floatRef = useRef<Group>(null);
-  const planeRef =
-    useRef<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>>(
-      null
-    );
+  const planeRef = useRef<Group>(null);
   const [hovering, setHovering] = useState(false);
-  const [showImage, setShowImage] = useState(false);
 
   useFrame(() => {
     if (!visible) return;
     if (!groupRef.current) return;
     if (!floatRef.current) return;
+    if (!planeRef.current) return;
 
-    if (showImage) {
+    if (showVideo) {
       planeRef.current.position.x = THREE.MathUtils.lerp(
         planeRef.current.position.x,
-        groupRef.current.position.x + 100,
+        groupRef.current.position.x,
         0.01
       );
 
       planeRef.current.position.y = THREE.MathUtils.lerp(
         planeRef.current.position.y,
-        groupRef.current.position.y,
+        groupRef.current.position.y + 9,
         0.01
       );
 
@@ -186,28 +212,40 @@ function Blob({ imageUrl, position, visible, onClick }: BlobProps) {
 
   return (
     <>
-      {/* <Billboard> */}
+      <group ref={planeRef} visible={showVideo} position={position}>
+        <Box args={[10, 10]}>
+          <MeshTransmissionMaterial
+            distortionScale={0.1}
+            temporalDistortion={1}
+            transmission={0.99}
+            color={"#fbd9ff"}
+            roughness={0}
+            thickness={1}
+            anisotropicBlur={1}
+          />
+        </Box>
+        <Plane args={[9, 9]}>
+          <meshLambertMaterial side={DoubleSide}>
+            <videoTexture attach={"map"} args={[video]} />
+          </meshLambertMaterial>
+        </Plane>
+      </group>
 
-      <Plane ref={planeRef} args={[100, 100]} visible={showImage}>
-        <meshLambertMaterial map={texture} side={DoubleSide} />
-      </Plane>
-      {/* </Billboard> */}
       <Float
         ref={floatRef}
         speed={5}
-        rotationIntensity={0.1}
-        floatIntensity={0.5}
+        rotationIntensity={0.5}
+        floatIntensity={2}
       >
         <group
           position={position}
           ref={groupRef}
-          onDoubleClick={() => setShowImage(true)}
-          onClick={() => onClick(groupRef.current)}
+          onClick={() => onClick(groupRef.current, planeRef.current)}
           onPointerEnter={() => setHovering(true)}
           onPointerLeave={() => setHovering(false)}
         >
           <animated.mesh scale={scale}>
-            <Sphere args={[13.5, 48, 48]} castShadow>
+            <Sphere args={[1.625, 48, 48]} castShadow>
               <MeshTransmissionMaterial
                 distortionScale={0.1}
                 temporalDistortion={1}
@@ -215,13 +253,13 @@ function Blob({ imageUrl, position, visible, onClick }: BlobProps) {
                 color={"#fbd9ff"}
                 roughness={0}
                 thickness={0.9}
-                chromaticAberration={0.4}
-                anisotropicBlur={5}
-                distortion={1}
+                chromaticAberration={0.1}
+                anisotropicBlur={0.5}
+                distortion={0.5}
               />
             </Sphere>
 
-            <Sphere args={[10, 48, 48]}>
+            <Sphere args={[1, 48, 48]}>
               <meshPhysicalMaterial map={texture} roughness={0.1} />
             </Sphere>
           </animated.mesh>
