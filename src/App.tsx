@@ -5,12 +5,11 @@ import { KeyboardControls } from "@react-three/drei";
 // import { MirrorScene } from "./scenes/mirror";
 import VoidScene from "./scenes/void";
 import { useEffect } from "react";
-import { v4 } from "uuid";
 
 function App() {
   useEffect(() => {
     if (!localStorage.getItem("uuid")) {
-      localStorage.setItem("uuid", v4());
+      localStorage.setItem("uuid", window.crypto.randomUUID());
     }
   }, []);
 
