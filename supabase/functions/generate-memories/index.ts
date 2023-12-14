@@ -91,11 +91,19 @@ Deno.serve(async (req) => {
   for (let i = 0; i < jsonRes.length; i++) {
     const d = jsonRes[i];
 
+    if (!d.artifacts[0]?.base64) {
+      continue;
+    }
+
     await supabaseClient.storage
       .from("memories")
-      .upload(`public/${i}.webp`, base64.toArrayBuffer(d.artifacts[0].base64), {
-        contentType: "image/webp",
-      });
+      .upload(
+        `public/${groupId}/${i}.webp`,
+        base64.toArrayBuffer(d.artifacts[0].base64),
+        {
+          contentType: "image/webp",
+        }
+      );
 
     await supabaseClient.from("memories").insert({
       group_id: memoryGroupId,
@@ -103,7 +111,7 @@ Deno.serve(async (req) => {
       image: Deno.env.get("DENO_DEPLOYMENT_ID")
         ? Deno.env.get("SUPABASE_URL")
         : "http://localhost:54321" +
-          `/storage/v1/object/public/memories/public/${i}.webp`,
+          `/storage/v1/object/public/memories/public/${groupId}/${i}.webp`,
     });
   }
 
