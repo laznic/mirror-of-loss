@@ -89,9 +89,10 @@ function Controls({ pos = new Vector3(), look = new Vector3() }) {
 
 interface BlobsProps {
   visible: boolean;
+  groupId: number;
 }
 
-export default function Blobs({ visible }: BlobsProps) {
+export default function Blobs({ visible, groupId }: BlobsProps) {
   const [memories, setMemories] = useState([]);
   const [camPos, setCamPos] = useState();
   const [lookAt, setLookAt] = useState();
@@ -118,6 +119,7 @@ export default function Blobs({ visible }: BlobsProps) {
         .from("memories")
         .select()
         .order("id", { ascending: false })
+        .eq("group_id", groupId)
         .limit(4);
 
       if (data) {
@@ -126,7 +128,7 @@ export default function Blobs({ visible }: BlobsProps) {
     }
 
     fetchMemories();
-  }, [visible]);
+  }, [visible, groupId]);
 
   return (
     <>

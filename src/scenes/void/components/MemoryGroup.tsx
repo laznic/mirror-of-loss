@@ -2,8 +2,14 @@ import { config, useSpring, animated } from "@react-spring/three";
 import { MeshDistortMaterial, Sphere } from "@react-three/drei";
 import { useState } from "react";
 import Blobs from "./Blobs";
+import { Vector3Tuple } from "three";
 
-export default function MemoryGroup() {
+interface MemoryGroupProps {
+  position?: Vector3Tuple;
+  id: number;
+}
+
+export default function MemoryGroup({ position, id }: MemoryGroupProps) {
   const [hovering, setHovering] = useState(false);
   const [showBlobs, setShowBlobs] = useState(false);
   const [blobsHidden, setBlobsHidden] = useState(true);
@@ -34,7 +40,7 @@ export default function MemoryGroup() {
   return (
     <>
       <group
-        position={[0, 1, 0]}
+        position={position}
         onClick={() => {
           setShowBlobs((prev) => !prev);
 
@@ -57,9 +63,9 @@ export default function MemoryGroup() {
           </Sphere>
         </animated.mesh>
       </group>
-      <group position={[0, 1, 0]} visible={!blobsHidden}>
+      <group position={position} visible={!blobsHidden}>
         <animated.mesh scale={scale2}>
-          <Blobs visible={!blobsHidden} />
+          <Blobs visible={!blobsHidden} groupId={id} />
         </animated.mesh>
       </group>
     </>
