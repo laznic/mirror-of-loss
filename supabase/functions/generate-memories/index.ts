@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
 
   const { data: memoryGroupId } = await supabaseClient.rpc(
     "insert_memory_group",
-    { memory: input }
+    { memory: input, player_id: playerId }
   );
 
   for (let i = 0; i < jsonRes.length; i++) {
