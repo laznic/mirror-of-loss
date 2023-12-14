@@ -21,13 +21,15 @@ export default function Controls() {
     return cc;
   }, []);
 
-  const shouldUpdate = useRef(false);
+  const shouldUpdatePos = useRef(false);
+  const shouldUpdateLookAt = useRef(false);
   const currentPos = useRef(camPos);
+  const currentLookAt = useRef(lookAt);
 
-  console.log(camPos);
-
-  shouldUpdate.current = !camPos.equals(currentPos.current);
+  shouldUpdatePos.current = !camPos.equals(currentPos.current);
   currentPos.current = camPos;
+  shouldUpdateLookAt.current = !lookAt.equals(currentLookAt.current);
+  currentLookAt.current = lookAt;
 
   useFrame((state, delta) => {
     const { forward, backward, left, right, jump, crouch } = get();
@@ -56,9 +58,10 @@ export default function Controls() {
       controls.elevate(-50 * delta, true);
     }
 
-    if (shouldUpdate.current) {
+    if (shouldUpdatePos.current && shouldUpdateLookAt.current) {
       state.camera.position.lerp(camPos, 0.75);
       state.camera.updateProjectionMatrix();
+
       controls.setLookAt(
         state.camera.position.x,
         state.camera.position.y,
@@ -72,8 +75,13 @@ export default function Controls() {
 
     controls.update(delta);
 
-    if (!controls.active && shouldUpdate.current) {
-      shouldUpdate.current = false;
+    if (
+      !controls.active &&
+      shouldUpdatePos.current &&
+      shouldUpdateLookAt.current
+    ) {
+      shouldUpdatePos.current = false;
+      shouldUpdateLookAt.current = false;
     }
   });
 

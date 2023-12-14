@@ -17,22 +17,28 @@ import { useCameraContext } from "../context/CameraContext";
 interface BlobsProps {
   visible: boolean;
   groupId: number;
+  position?: Vector3Tuple;
 }
 
-export default function Blobs({ visible, groupId }: BlobsProps) {
+export default function Blobs({ visible, groupId, position }: BlobsProps) {
   const [memories, setMemories] = useState([]);
   const [showVideo, setShowVideo] = useState<number | null>(null);
   const { setCamPos, setLookAt } = useCameraContext();
 
-  function onClick(memoryId: number, blob: Group, plane: Group) {
+  function onClick(memoryId: number, blob: Group) {
     const newPosition = new Vector3(
-      blob.position.x,
-      blob.position.y + 9,
-      blob.position.z + 10
+      position[0] + blob.position.x,
+      position[1] + 17.5,
+      position[2] + 12
+    );
+    const newLookAt = new Vector3(
+      position[0] + blob.position.x,
+      position[1] + 17.5,
+      position[2]
     );
 
     setCamPos(newPosition);
-    setLookAt(plane.position);
+    setLookAt(newLookAt);
 
     setShowVideo(memoryId);
   }
@@ -56,22 +62,20 @@ export default function Blobs({ visible, groupId }: BlobsProps) {
     fetchMemories();
   }, [visible, groupId]);
 
-  if (!visible) return null;
+  if (!visible) return;
 
   return (
     <>
-      <group>
+      <group position={position}>
         {memories.map(
           (memory: { id: number; image: string }, index: number) => (
             <Blob
+              index={index}
               key={memory.id}
-              position={[index * 5 - 7.5, 5, 0]}
+              position={[index * 5 - 7.5, 8, 0]}
               imageUrl={memory.image}
-              onClick={(blobRef, planeRef) =>
-                onClick(memory.id, blobRef, planeRef)
-              }
+              onClick={(blobRef) => onClick(memory.id, blobRef)}
               showVideo={showVideo === memory.id}
-              visible
             />
           )
         )}
@@ -86,21 +90,27 @@ interface BlobProps {
   visible: boolean;
   onClick: (blobRef: Group) => void;
   showVideo: boolean;
+  index: number;
 }
 
-function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
-  const texture = useTexture(imageUrl);
+function Blob({ imageUrl, position, onClick, showVideo, index }: BlobProps) {
+  const textureLoaded = useRef(false);
+  const animatePosition = useRef(false);
+  const texture = useTexture(
+    imageUrl ?? {},
+    () => (textureLoaded.current = true)
+  );
 
-  // const [video] = useState(() => {
-  //   const vid = document.createElement("video");
-  //   vid.src =
-  //     "https://replicate.delivery/pbxt/aPTXL6n2ZYqgFVNgT5OP7NdLsNVPh5PS7Ee5b0g3EHhnmpAJA/000087.mp4";
-  //   vid.crossOrigin = "Anonymous";
-  //   vid.loop = true;
-  //   vid.muted = true;
-  //   vid.play();
-  //   return vid;
-  // });
+  const [video] = useState(() => {
+    const vid = document.createElement("video");
+    vid.src =
+      "https://replicate.delivery/pbxt/aPTXL6n2ZYqgFVNgT5OP7NdLsNVPh5PS7Ee5b0g3EHhnmpAJA/000087.mp4";
+    vid.crossOrigin = "Anonymous";
+    vid.loop = true;
+    vid.muted = true;
+    vid.play();
+    return vid;
+  });
 
   const groupRef = useRef<Group>(null);
   const floatRef = useRef<Group>(null);
@@ -108,10 +118,28 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
   const [hovering, setHovering] = useState(false);
 
   useFrame(() => {
-    if (!visible) return;
     if (!groupRef.current) return;
     if (!floatRef.current) return;
-    if (!planeRef.current) return;
+
+    if (animatePosition.current) {
+      groupRef.current.position.x = MathUtils.lerp(
+        groupRef.current.position.x,
+        position[0],
+        0.1
+      );
+
+      groupRef.current.position.y = MathUtils.lerp(
+        groupRef.current.position.y,
+        position[1],
+        0.1
+      );
+
+      groupRef.current.position.z = MathUtils.lerp(
+        groupRef.current.position.z,
+        position[2],
+        0.1
+      );
+    }
 
     if (showVideo) {
       planeRef.current.position.x = MathUtils.lerp(
@@ -135,15 +163,17 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
   });
 
   const { scale } = useSpring({
-    scale: hovering ? 1.2 : 1,
+    scale: hovering ? 1.2 : textureLoaded.current ? 1 : 0,
     config: config.wobbly,
+    delay: index * 150,
+    onStart: () => {
+      animatePosition.current = true;
+    },
   });
-
-  if (!visible) return null;
 
   return (
     <>
-      {/* <group ref={planeRef} visible={showVideo} position={position}>
+      <group ref={planeRef} visible={showVideo} position={position}>
         <Box args={[10, 10]}>
           <MeshTransmissionMaterial
             distortionScale={0.1}
@@ -160,7 +190,7 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
             <videoTexture attach={"map"} args={[video]} />
           </meshLambertMaterial>
         </Plane>
-      </group> */}
+      </group>
 
       <Float
         ref={floatRef}
@@ -169,9 +199,8 @@ function Blob({ imageUrl, position, visible, onClick, showVideo }: BlobProps) {
         floatIntensity={2}
       >
         <group
-          position={position}
           ref={groupRef}
-          onClick={() => onClick(groupRef.current, planeRef.current)}
+          onClick={() => onClick(groupRef.current)}
           onPointerEnter={() => setHovering(true)}
           onPointerLeave={() => setHovering(false)}
         >

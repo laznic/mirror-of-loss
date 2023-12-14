@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import supabase from "../../supabase";
 import Controls from "./components/Controls";
 import CameraContextProvider from "./context/CameraContext";
+import MemoryGroupContextProvider from "./context/MemoryGroupContext";
 
 export default function VoidScene() {
   const [memoryGroups, setMemoryGroups] = useState([]);
@@ -60,17 +61,21 @@ export default function VoidScene() {
 
   return (
     <CameraContextProvider>
-      <Controls />
+      <MemoryGroupContextProvider>
+        <Controls />
 
-      {memoryGroups.map((group) => (
-        <MemoryGroup
-          key={group.id}
-          id={group.id}
-          position={[group.x, group.y, group.z]}
-        />
-      ))}
+        {memoryGroups.map((group) => (
+          <MemoryGroup
+            date={group.created_at}
+            key={group.id}
+            id={group.id}
+            memory={group.memory}
+            position={[group.x, group.y, group.z]}
+          />
+        ))}
 
-      <Environment preset="night" background blur={2} />
+        <Environment preset="night" background blur={2} />
+      </MemoryGroupContextProvider>
     </CameraContextProvider>
   );
 }

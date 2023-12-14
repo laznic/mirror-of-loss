@@ -2,12 +2,12 @@ import { ReactNode, createContext, useContext, useState } from "react";
 
 interface MemoryGroupContext {
   currentGroup: number | null;
-  setCurrentGroup: (id: number | null) => void;
+  showBlobsForGroup: (id: number | null) => void;
 }
 
 export const MemoryGroupContext = createContext<MemoryGroupContext>({
   currentGroup: null,
-  setCurrentGroup: () => {},
+  showBlobsForGroup: () => {},
 });
 
 interface MemoryGroupContextProviderProps {
@@ -20,7 +20,9 @@ export default function MemoryGroupContextProvider({
   const [currentGroup, setCurrentGroup] = useState<number | null>(null);
 
   return (
-    <MemoryGroupContext.Provider value={{ currentGroup, setCurrentGroup }}>
+    <MemoryGroupContext.Provider
+      value={{ currentGroup, showBlobsForGroup: setCurrentGroup }}
+    >
       {children}
     </MemoryGroupContext.Provider>
   );

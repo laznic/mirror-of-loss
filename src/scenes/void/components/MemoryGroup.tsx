@@ -1,20 +1,33 @@
 import { config, useSpring, animated } from "@react-spring/three";
-import { MeshDistortMaterial, Sphere } from "@react-three/drei";
-import { useState } from "react";
+import { MeshDistortMaterial, Sphere, Text } from "@react-three/drei";
+import { useEffect, useState } from "react";
 import Blobs from "./Blobs";
 import { Vector3, Vector3Tuple } from "three";
 import { useCameraContext } from "../context/CameraContext";
+import { useMemoryGroupContext } from "../context/MemoryGroupContext";
+import RedactionRegular from "../../../assets/Redaction-Regular.otf";
+import RedactionBold from "../../../assets/Redaction-Bold.otf";
+import RedactionItalic from "../../../assets/Redaction-Italic.otf";
+import { format } from "date-fns";
 
 interface MemoryGroupProps {
   position?: Vector3Tuple;
   id: number;
+  date: string;
+  memory: string;
 }
 
-export default function MemoryGroup({ position, id }: MemoryGroupProps) {
+export default function MemoryGroup({
+  position,
+  id,
+  date,
+  memory,
+}: MemoryGroupProps) {
   const [hovering, setHovering] = useState(false);
   const [showBlobs, setShowBlobs] = useState(false);
   const [blobsHidden, setBlobsHidden] = useState(true);
   const { setCamPos, setLookAt } = useCameraContext();
+  const { currentGroup, showBlobsForGroup } = useMemoryGroupContext();
 
   const { scale } = useSpring({
     scale: hovering ? 1.2 : 1,
@@ -39,16 +52,24 @@ export default function MemoryGroup({ position, id }: MemoryGroupProps) {
     },
   }));
 
+  useEffect(() => {
+    if (currentGroup === id) {
+      api.start({ scale: 1 });
+    }
+
+    if (currentGroup !== id) {
+      api.start({ scale: 0 });
+    }
+  }, [currentGroup, id, api]);
+
   return (
     <>
       <group
         position={position}
         onClick={() => {
-          setShowBlobs((prev) => !prev);
+          showBlobsForGroup(id);
           setCamPos(new Vector3(position[0], position[1], position[2] + 20));
           setLookAt(new Vector3(position[0], position[1], position[2]));
-
-          api.start({ scale: showBlobs ? 0 : 1 });
         }}
         onPointerEnter={() => setHovering(true)}
         onPointerLeave={() => setHovering(false)}
@@ -66,14 +87,37 @@ export default function MemoryGroup({ position, id }: MemoryGroupProps) {
             />
           </Sphere>
         </animated.mesh>
+        <Text
+          visible={currentGroup === id}
+          color={"#fff"}
+          position={[0, 4.5, 0]}
+          font={RedactionItalic}
+          anchorX={"center"}
+        >
+          {`"${memory}"`}
+        </Text>
+        <Text
+          visible={currentGroup === id}
+          color={"#fff"}
+          fontSize={0.65}
+          position={[0, 3.25, 0]}
+          font={RedactionRegular}
+          anchorX={"center"}
+        >
+          {format(new Date(`${date}T00:00:00`), "MMM do, yyyy")}
+        </Text>
+        {/* <Text
+          visible={currentGroup === id}
+          color={"#fff"}
+          fontSize={0.65}
+          position={[0, 3, 0]}
+          font={RedactionBold}
+          anchorX={"center"}
+        >
+          {"Show"}
+        </Text> */}
       </group>
-      {!blobsHidden && (
-        <group position={position}>
-          <animated.mesh scale={scale2}>
-            <Blobs visible={!blobsHidden} groupId={id} />
-          </animated.mesh>
-        </group>
-      )}
+      <Blobs position={position} visible={currentGroup === id} groupId={id} />
     </>
   );
 }
