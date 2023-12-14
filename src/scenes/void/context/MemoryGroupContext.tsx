@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 
 interface MemoryGroupContext {
   currentGroup: number | null;
@@ -24,4 +24,8 @@ export default function MemoryGroupContextProvider({
       {children}
     </MemoryGroupContext.Provider>
   );
+}
+
+export function useMemoryGroupContext() {
+  return useContext(MemoryGroupContext);
 }
