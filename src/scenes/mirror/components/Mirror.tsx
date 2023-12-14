@@ -9,7 +9,7 @@ import { Depth, Displace, Fresnel, LayerMaterial } from "lamina";
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { MathUtils } from "three";
+import { DoubleSide, MathUtils } from "three";
 
 import mirror from "../../../assets/mirror.png";
 
@@ -29,8 +29,13 @@ export default function Mirror() {
 
   return (
     <group>
-      <Circle args={[75, 75]} position={[0, 0, 0]}>
-        <MeshReflectorMaterial map={texture} mirror={0.1} alphaTest={0.5} />
+      <Circle args={[5, 100]} position={[0, 5, 0]}>
+        <MeshReflectorMaterial
+          map={texture}
+          mirror={0.1}
+          alphaTest={0.5}
+          side={DoubleSide}
+        />
       </Circle>
     </group>
   );

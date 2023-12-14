@@ -6,14 +6,15 @@ import {
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { Vector3Tuple } from "three";
+import { DoubleSide, Vector3Tuple } from "three";
 import brazier from "../../../assets/brazier-animated.png";
 
 interface BrazierProps {
   position: Vector3Tuple;
+  rotation?: Vector3Tuple;
 }
 
-export default function Brazier({ position }: BrazierProps) {
+export default function Brazier({ position, rotation }: BrazierProps) {
   const texture = useTexture(brazier);
   const offset = useRef(0);
 
@@ -33,9 +34,14 @@ export default function Brazier({ position }: BrazierProps) {
   });
 
   return (
-    <Billboard>
-      <Plane args={[50, 40]} position={position}>
-        <MeshReflectorMaterial map={texture} mirror={0.1} alphaTest={0.5} />
+    <Billboard position={position}>
+      <Plane args={[4, 3]} rotation={rotation}>
+        <MeshReflectorMaterial
+          map={texture}
+          mirror={0.1}
+          alphaTest={0.5}
+          side={DoubleSide}
+        />
       </Plane>
     </Billboard>
   );

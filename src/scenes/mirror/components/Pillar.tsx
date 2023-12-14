@@ -10,7 +10,7 @@ export default function Pillar({ position }: PillarProps) {
   const texture = useTexture(pillar);
 
   return (
-    <Box args={[25, 175, 25]} position={position}>
+    <Box args={[2, 14, 2]} position={position}>
       <meshLambertMaterial map={texture} alphaTest={0} />
     </Box>
   );
