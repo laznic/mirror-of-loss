@@ -29,7 +29,7 @@ export default function Mirror() {
 
   return (
     <group>
-      <Circle args={[5, 100]} position={[0, 5, 0]}>
+      <Circle args={[5, 100]} position={[0, 5, -50]}>
         <MeshReflectorMaterial
           map={texture}
           mirror={0.1}
