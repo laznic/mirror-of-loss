@@ -98,21 +98,24 @@ Deno.serve(async (req) => {
     await supabaseClient.storage
       .from("memories")
       .upload(
-        `public/${groupId}/${i}.webp`,
+        `public/${memoryGroupId}/${i}.webp`,
         base64.toArrayBuffer(d.artifacts[0].base64),
         {
           contentType: "image/webp",
         }
       );
 
-    await supabaseClient.from("memories").insert({
-      group_id: memoryGroupId,
-      player_id: playerId,
-      image: Deno.env.get("DENO_DEPLOYMENT_ID")
-        ? Deno.env.get("SUPABASE_URL")
-        : "http://localhost:54321" +
-          `/storage/v1/object/public/memories/public/${groupId}/${i}.webp`,
-    });
+    // Add small timeout so that each bubble gets added one by one with nice transition
+    setTimeout(async () => {
+      await supabaseClient.from("memories").insert({
+        group_id: memoryGroupId,
+        player_id: playerId,
+        image: Deno.env.get("DENO_DEPLOYMENT_ID")
+          ? Deno.env.get("SUPABASE_URL")
+          : "http://localhost:54321" +
+            `/storage/v1/object/public/memories/public/${memoryGroupId}/${i}.webp`,
+      });
+    }, 1000 * i);
   }
 
   return new Response("ok", {
