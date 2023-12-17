@@ -3,6 +3,8 @@ import {
   Circle,
   MeshReflectorMaterial,
   Sphere,
+  MeshDistortMaterial,
+  MeshTransmissionMaterial,
 } from "@react-three/drei";
 
 import { Depth, Displace, Fresnel, LayerMaterial } from "lamina";
@@ -33,11 +35,29 @@ export default function Mirror() {
       <Circle args={[5, 100]}>
         <MeshReflectorMaterial
           map={texture}
-          mirror={0.1}
-          alphaTest={0.5}
+          mirror={0.3}
+          alphaTest={0.1}
           side={DoubleSide}
         />
       </Circle>
+
+      <Sphere
+        args={[35, 100, 20, undefined, undefined, 0, 0.1]}
+        position={[0, 0, -34.86]}
+        rotation={[Math.PI / 2, 0, 0]}
+      >
+        <MeshTransmissionMaterial
+          color={"#443a61"}
+          distortion={1}
+          temporalDistortion={0.5}
+          distortionScale={1}
+          chromaticAberration={1}
+          anisotropicBlur={0.5}
+          roughness={0}
+          thickness={0.7}
+          transmission={0.95}
+        />
+      </Sphere>
     </RigidBody>
   );
 }

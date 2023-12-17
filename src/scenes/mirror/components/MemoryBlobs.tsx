@@ -32,7 +32,7 @@ export default function MemoryBlobs() {
   return memories.map((memory: { id: number; image: string }) => (
     <Blob
       key={memory.id}
-      position={[0, 0, 80]}
+      position={[0, -2, -84]}
       imageUrl={memory.image}
       visible
     />
@@ -52,49 +52,40 @@ function Blob({ imageUrl, position, visible }: BlobProps) {
   useFrame(() => {
     if (!visible) return;
     if (!groupRef.current) return;
-    if (groupRef.current.position.z <= -30) return;
+    // if (groupRef.current.position.z <= -30) return;
 
     groupRef.current.position.z = MathUtils.lerp(
       groupRef.current.position.z,
-      -30,
-      0.002
-    );
-    groupRef.current.scale.x = MathUtils.lerp(
-      groupRef.current.scale.x,
-      0,
+      -100,
       0.0005
     );
-    groupRef.current.scale.y = MathUtils.lerp(
-      groupRef.current.scale.y,
-      0,
-      0.0005
-    );
-    groupRef.current.scale.z = MathUtils.lerp(
-      groupRef.current.scale.z,
-      0,
+
+    groupRef.current.position.y = MathUtils.lerp(
+      groupRef.current.position.y,
+      -0.5,
       0.0005
     );
   });
 
   return (
     <group visible={visible}>
-      <Float speed={5} rotationIntensity={2} floatIntensity={5}>
+      <Float speed={5} rotationIntensity={0.05} floatIntensity={1}>
         <group position={position} ref={groupRef}>
-          <Sphere args={[13.5, 48, 48]} castShadow>
+          <Sphere args={[0.33, 48, 48]} castShadow>
             <MeshTransmissionMaterial
-              distortionScale={0.1}
-              temporalDistortion={1}
+              distortionScale={1}
+              temporalDistortion={0.1}
               transmission={0.95}
               color={"#fbd9ff"}
               roughness={0}
-              thickness={0.9}
-              chromaticAberration={0.4}
-              anisotropicBlur={5}
-              distortion={1}
+              thickness={0.2}
+              chromaticAberration={0.2}
+              anisotropicBlur={0.5}
+              distortion={1.2}
             />
           </Sphere>
 
-          <Sphere args={[10, 48, 48]}>
+          <Sphere args={[0.2, 48, 48]}>
             <meshPhysicalMaterial map={texture} roughness={0.1} />
           </Sphere>
         </group>

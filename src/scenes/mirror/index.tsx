@@ -2,6 +2,7 @@ import {
   Box,
   Cloud,
   Cylinder,
+  Html,
   Plane,
   Sphere,
   useTexture,
@@ -10,13 +11,7 @@ import Brazier from "./components/Brazier";
 import MemoryBlobs from "./components/MemoryBlobs";
 import Mirror from "./components/Mirror";
 import Pillar from "./components/Pillar";
-import {
-  ConvexHullCollider,
-  CuboidCollider,
-  CylinderCollider,
-  Physics,
-  RigidBody,
-} from "@react-three/rapier";
+import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Controller from "ecctrl";
 
 import Flooring from "../../assets/flooring.png";
@@ -24,17 +19,22 @@ import WallDecor from "../../assets/walldecor.png";
 import WallDecorBack from "../../assets/walldecor-back.png";
 import FancyWall from "../../assets/fancy-wall.png";
 
-import { DoubleSide, RepeatWrapping } from "three";
+import { RepeatWrapping } from "three";
 import SidePillar from "./components/SidePillar";
 import Arc from "./components/Arc";
 import Wall from "./components/Wall";
 import Entrance from "./components/Entrance";
+import { useFrame } from "@react-three/fiber";
+import { useRef, useState } from "react";
+import supabase from "../../supabase";
 
 export function MirrorScene() {
   const flooring = useTexture(Flooring);
   const wallDecor = useTexture(WallDecor);
   const wallDecorBack = useTexture(WallDecorBack);
   const fancyWall = useTexture(FancyWall);
+  const inputRef = useRef(null);
+  const [askForMemories, setAskForMemories] = useState(false);
 
   flooring.wrapS = RepeatWrapping;
   flooring.wrapT = RepeatWrapping;
@@ -48,6 +48,12 @@ export function MirrorScene() {
   fancyWall.wrapT = RepeatWrapping;
   fancyWall.repeat.set(4, 4);
 
+  useFrame((state) => {
+    if (askForMemories) {
+      inputRef.current.focus();
+    }
+  });
+
   return (
     <>
       <Physics gravity={[0, -30, 0]} timeStep={"vary"} debug>
@@ -59,6 +65,8 @@ export function MirrorScene() {
           autoBalance={false}
           camMaxDis={-0.01}
           sprintMult={6}
+          maxVelLimit={askForMemories ? 0 : undefined}
+          jumpVel={askForMemories ? 0 : undefined}
         >
           <Sphere />
         </Controller>
@@ -73,6 +81,31 @@ export function MirrorScene() {
         </RigidBody>
 
         <Cloud position={[0, 1, 20]} volume={10} fade={200} speed={0.2} />
+
+        <Html position={[0, -1, -88]}>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+
+              const data = new FormData(e.target);
+              const input = data.get("memory");
+
+              await supabase.functions.invoke("generate-memories", {
+                body: {
+                  input,
+                  playerId: localStorage.getItem("uuid"),
+                },
+              });
+            }}
+          >
+            <input
+              name="memory"
+              ref={inputRef}
+              type="text"
+              placeholder="Enter memory"
+            />
+          </form>
+        </Html>
 
         <Mirror />
 
@@ -128,7 +161,11 @@ export function MirrorScene() {
           </Cylinder>
         </RigidBody>
 
-        <RigidBody position={[0, -3.5, -85.5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <RigidBody
+          type={"fixed"}
+          position={[0, -3.5, -85.5]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
           <Plane args={[4, 3]}>
             <meshStandardMaterial transparent opacity={0} />
           </Plane>
@@ -136,7 +173,7 @@ export function MirrorScene() {
           <CuboidCollider
             args={[2, 2, 1]}
             sensor
-            onIntersectionEnter={() => console.log("ask for memories")}
+            // onIntersectionEnter={() => setAskForMemories(true)}
           />
         </RigidBody>
 
