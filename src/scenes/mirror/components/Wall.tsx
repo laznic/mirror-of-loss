@@ -1,7 +1,7 @@
 import { Plane, useTexture } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import { DoubleSide, RepeatWrapping, Vector3Tuple } from "three";
-import BasicWall from "../../../assets/fancy-wall.png";
+import BasicWall from "../../../assets/basic-wall.png";
 
 interface WallProps {
   position: Vector3Tuple;

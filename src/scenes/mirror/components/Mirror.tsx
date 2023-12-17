@@ -12,6 +12,7 @@ import { useFrame } from "@react-three/fiber";
 import { DoubleSide, MathUtils } from "three";
 
 import mirror from "../../../assets/mirror.png";
+import { RigidBody } from "@react-three/rapier";
 
 export default function Mirror() {
   const texture = useTexture(mirror);
@@ -28,8 +29,8 @@ export default function Mirror() {
   // });
 
   return (
-    <group>
-      <Circle args={[5, 100]} position={[0, 5, -50]}>
+    <RigidBody type={"fixed"} position={[0, -1, -90]}>
+      <Circle args={[5, 100]}>
         <MeshReflectorMaterial
           map={texture}
           mirror={0.1}
@@ -37,6 +38,6 @@ export default function Mirror() {
           side={DoubleSide}
         />
       </Circle>
-    </group>
+    </RigidBody>
   );
 }
