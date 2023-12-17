@@ -19,7 +19,11 @@ export default function SidePillar({
 
   return (
     <group position={position}>
-      <Plane args={[12, 12]} position={[0, 4.75, 0]} rotation={[0, 1.55, 0]}>
+      <Plane
+        args={[12, 12]}
+        position={[0.4 * (brazierFlipped ? -1 : 1), 4.75, 0]}
+        rotation={[0, 1.57079, 0]}
+      >
         <meshLambertMaterial
           map={pillarWithStep}
           alphaTest={0.1}
@@ -27,11 +31,11 @@ export default function SidePillar({
         />
       </Plane>
 
-      {!hideRightPillar && <Pillar position={[0, 6.9, -5.65]} />}
+      {/* {!hideRightPillar && <Pillar position={[0, 6.9, -5.65]} />} */}
 
-      <Pillar position={[0, 6.9, 5.5]} />
+      {/* <Pillar position={[0, 6.9, 5.5]} /> */}
 
-      <Brazier position={[0.7 * (brazierFlipped ? 1 : -1), 2.22, 0]} />
+      <Brazier position={[0.25 * (brazierFlipped ? 1 : -1), 2.22, 0]} />
     </group>
   );
 }

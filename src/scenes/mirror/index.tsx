@@ -1,4 +1,4 @@
-import { Cloud, Plane, Sphere, useTexture } from "@react-three/drei";
+import { Box, Cloud, Plane, Sphere, useTexture } from "@react-three/drei";
 import Brazier from "./components/Brazier";
 import MemoryBlobs from "./components/MemoryBlobs";
 import Mirror from "./components/Mirror";
@@ -6,12 +6,34 @@ import Pillar from "./components/Pillar";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Controller from "ecctrl";
 import Entrance from "../../assets/entrance.png";
+import BasicWall from "../../assets/fancy-wall.png";
+import Flooring from "../../assets/flooring.png";
+import WallDecor from "../../assets/walldecor.png";
+import WallDecorBack from "../../assets/walldecor-back.png";
+import Arc from "../../assets/arc.png";
 
-import { DoubleSide } from "three";
+import { DoubleSide, RepeatWrapping } from "three";
 import SidePillar from "./components/SidePillar";
 
 export function MirrorScene() {
   const entrance = useTexture(Entrance);
+  const basicWall = useTexture(BasicWall);
+  const flooring = useTexture(Flooring);
+  const wallDecor = useTexture(WallDecor);
+  const wallDecorBack = useTexture(WallDecorBack);
+  const arc = useTexture(Arc);
+
+  basicWall.wrapS = RepeatWrapping;
+  basicWall.wrapT = RepeatWrapping;
+  basicWall.repeat.set(3, 0.9);
+
+  flooring.wrapS = RepeatWrapping;
+  flooring.wrapT = RepeatWrapping;
+  flooring.repeat.set(240, 240);
+
+  wallDecorBack.wrapS = RepeatWrapping;
+  wallDecorBack.wrapT = RepeatWrapping;
+  wallDecorBack.repeat.set(1, 1);
 
   return (
     <>
@@ -27,10 +49,11 @@ export function MirrorScene() {
           <Sphere />
         </Controller>
 
+        {/* floor */}
         <RigidBody type="fixed" colliders={false}>
           <mesh receiveShadow position={[0, 0, 0]} rotation-x={-Math.PI / 2}>
             <planeGeometry args={[1000, 1000]} />
-            <meshStandardMaterial color="#2a2738" />
+            <meshStandardMaterial map={flooring} />
           </mesh>
           <CuboidCollider args={[1000, 2, 1000]} position={[0, -2, 0]} />
         </RigidBody>
@@ -49,13 +72,80 @@ export function MirrorScene() {
 
         <MemoryBlobs />
 
-        <SidePillar hideRightPillar position={[-10, 0, -10]} />
-        <SidePillar hideRightPillar position={[-10, 0, -21.2]} />
-        <SidePillar position={[-10, 0, -32.4]} />
+        <Plane args={[25, 20]} position={[0, 9, -4.2]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane>
+        {/* <Plane args={[25, 20]} position={[0, 9, -5.5]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane> */}
 
-        <SidePillar brazierFlipped hideRightPillar position={[10, 0, -10]} />
-        <SidePillar brazierFlipped hideRightPillar position={[10, 0, -21.2]} />
-        <SidePillar brazierFlipped position={[10, 0, -32.4]} />
+        <SidePillar position={[-10, 0, -10]} />
+        <SidePillar brazierFlipped position={[10, 0, -10]} />
+        <Plane args={[25, 20]} position={[0, 9, -15.75]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane>
+        {/* <Plane args={[25, 20]} position={[0, 9, -16.7]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane> */}
+
+        <Plane args={[25, 20]} position={[0, 9, -27.3]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane>
+        {/* <Plane args={[25, 20]} position={[0, 9, -27.9]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane> */}
+        {/* <SidePillar hideRightPillar position={[-10, 0, -21.2]} /> */}
+
+        {/* <SidePillar brazierFlipped hideRightPillar position={[10, 0, -21.2]} /> */}
+
+        <SidePillar position={[-10, 0, -33]} />
+        <SidePillar brazierFlipped position={[10, 0, -33]} />
+        <Plane args={[25, 20]} position={[0, 9, -38.85]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane>
+        {/* <Plane args={[25, 20]} position={[0, 9, -39.1]}>
+          <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
+        </Plane> */}
+
+        <Plane
+          args={[50, 20]}
+          position={[-11, 8.5, -25]}
+          rotation={[0, 1.57079, 0]}
+        >
+          <meshLambertMaterial map={basicWall} side={DoubleSide} />
+        </Plane>
+
+        <Plane
+          args={[5, 5]}
+          position={[-10.7, 6, -22]}
+          rotation={[0, 1.57079, 0]}
+        >
+          <meshLambertMaterial map={wallDecor} />
+        </Plane>
+
+        <Plane
+          args={[5, 5]}
+          position={[10.7, 6, -22]}
+          rotation={[0, -1.57079, 0]}
+        >
+          <meshLambertMaterial map={wallDecor} />
+        </Plane>
+
+        <Box args={[0.5, 5.5, 5.5]} position={[11, 6, -22]}>
+          <meshLambertMaterial map={wallDecorBack} />
+        </Box>
+
+        <Box args={[0.5, 5.5, 5.5]} position={[-11, 6, -22]}>
+          <meshLambertMaterial map={wallDecorBack} />
+        </Box>
+
+        <Plane
+          args={[50, 20]}
+          position={[11, 8.5, -25]}
+          rotation={[0, 1.57079, 0]}
+        >
+          <meshLambertMaterial map={basicWall} side={DoubleSide} />
+        </Plane>
       </Physics>
     </>
   );
