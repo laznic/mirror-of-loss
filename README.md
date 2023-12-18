@@ -57,6 +57,8 @@ I'm a big fan of Baldur's Gate games, and especially been loving the latest inst
 - Adjustments to lighting and other styles
 - A lot of organization for the components and stuff
 - Image optimization via Sharp(?)
+- Also wanted to generate videos from the generated images, however didn't have time for that
+  - https://replicate.com/stability-ai/stable-video-diffusion
 
 ## The team / contributors
 - Niklas Lepistö ([GitHub](https://github.com/laznic), [Twitter](https://twitter.com/laznic))
