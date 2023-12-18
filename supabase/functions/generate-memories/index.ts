@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
     }, 1000 * i);
   }
 
-  return new Response("ok", {
+  return new Response(JSON.stringify({ memoryGroupId }), {
     headers: { "Content-Type": "application/json", ...corsHeaders },
   });
 });
