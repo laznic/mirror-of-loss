@@ -1,30 +1,60 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Mirror of Loss](https://github.com/laznic/mirror-of-loss/blob/main/public/share-image.png)
 
-Currently, two official plugins are available:
+## An AI powered WebGL experience, paying homage to Baldur's Gate 3 & Forgotten Realms
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Mirror of Loss is a WebGL experience, and a Baldur's Gate 3 / Forgotten Realms fan project. It's powered by AI: all the sprites, textures, and imagery were generated via Stable Diffusion (some with the help of OpenAI & GPT-4), and background music by Stable Audio.
 
-## Expanding the ESLint configuration
+https://mirrorofloss.com
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+> **Note**
+>
+> This project is optimized for desktop devices
 
-- Configure the top-level `parserOptions` property like this:
+Built with
+- [Supabase](https://supabase.com)
+- [React](https://reactjs.org/)
+- [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction)
+- [Stable Diffusion](https://stability.ai/stable-diffusion)
+- [Stable Audio](https://www.stableaudio.com/)
+- [OpenAI](https://openai.com/)
+- 
+## How it works
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+The steps are simple:
+1. Start the game
+2. Use WASD/Arrow keys to move in the map
+   - Space jumps/elevates the camera
+   - C key lowers the camera
+4. Go in front of the Mirror
+5. Type a memory and wait 
+6. Enjoy
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+List of Supabase features used:
+- Database
+  - storing memory groups and memories
+- Functions
+  - handles the memory generation via GPT-4 and SD 
+- Storage
+  - storing the memories
+
+## Motivation
+
+I'm a big fan of Baldur's Gate games, and especially been loving the latest installation. In it, they introduced this Mirror of Loss which just intrigues me. So naturally I wanted to do my own representation of it. I've also been planning to learn more about WebGL, so this seemed like a good chance to fiddle with it.
+
+
+## Ideas for the future
+
+- Error handling
+- 3D models
+  - now everything is mainly just pixel art due to not having enough time to make beautiful models
+- More shaders
+- Proper transitions between scenes
+- Adjustments to lighting and other styles
+- A lot of organization for the components and stuff  
+
+## The team / contributors
+- Niklas Lepistö ([GitHub](https://github.com/laznic), [Twitter](https://twitter.com/laznic))
+
+<sup>Made for Supabase Launch Week X Hackathon.</sup> 
+
