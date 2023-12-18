@@ -27,8 +27,10 @@ The steps are simple:
    - Space jumps/elevates the camera
    - C key lowers the camera
 4. Go in front of the Mirror
-5. Type a memory and wait 
+5. Type in a memory and wait 
 6. Enjoy
+
+You can go directly to https://mirrorofloss.com/void to see what kind of memories the mirror holds so far.
 
 List of Supabase features used:
 - Database
