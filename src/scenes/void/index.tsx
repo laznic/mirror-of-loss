@@ -27,7 +27,7 @@ export default function VoidScene() {
         setLookAt(new Vector3(data.x, data.y, data.z));
       }
 
-      // localStorage.removeItem("memoryGroupId");
+      localStorage.removeItem("memoryGroupId");
     }
 
     if (localStorage.getItem("memoryGroupId") && memoryGroups.length > 0) {
