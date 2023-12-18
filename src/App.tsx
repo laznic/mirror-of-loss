@@ -1,10 +1,17 @@
 import { Canvas } from "@react-three/fiber";
 import "./App.css";
-import { KeyboardControls } from "@react-three/drei";
+import {
+  KeyboardControls,
+  MeshPortalMaterial,
+  RoundedBox,
+} from "@react-three/drei";
 
 import { MirrorScene } from "./scenes/mirror";
 import VoidScene from "./scenes/void";
 import { useEffect } from "react";
+import { DoubleSide } from "three";
+import MainScene from "./scenes/main";
+import SceneContextProvider from "./scenes/main/context/SceneContext";
 
 const keyboardMap = [
   { name: "forward", keys: ["ArrowUp", "w", "W"] },
@@ -26,10 +33,8 @@ function App() {
   return (
     <>
       <Canvas
-        camera={{ fov: 90 }}
         shadows
-        style={{ width: "100%", height: "100%" }}
-        onPointerDown={(e) => e.target.requestPointerLock()}
+        style={{ width: "100%", height: "100%", background: "#000" }}
       >
         <KeyboardControls map={keyboardMap}>
           <ambientLight color={"#fff"} />
@@ -40,9 +45,9 @@ function App() {
             color={"#fff"}
             position={[-3, 1.5, 3]}
           />
-
-          {/* <VoidScene /> */}
-          <MirrorScene />
+          <SceneContextProvider>
+            <MainScene />
+          </SceneContextProvider>
         </KeyboardControls>
       </Canvas>
     </>

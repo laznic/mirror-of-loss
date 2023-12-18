@@ -106,16 +106,6 @@ export default function MemoryGroup({
         >
           {format(new Date(`${date}T00:00:00`), "MMM do, yyyy")}
         </Text>
-        {/* <Text
-          visible={currentGroup === id}
-          color={"#fff"}
-          fontSize={0.65}
-          position={[0, 3, 0]}
-          font={RedactionBold}
-          anchorX={"center"}
-        >
-          {"Show"}
-        </Text> */}
       </group>
       <Blobs position={position} visible={currentGroup === id} groupId={id} />
     </>

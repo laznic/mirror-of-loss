@@ -32,7 +32,7 @@ export default function Controls() {
   currentLookAt.current = lookAt;
 
   useFrame((state, delta) => {
-    const { forward, backward, left, right, jump, crouch } = get();
+    const { forward, backward, leftward, rightward, jump, crouch } = get();
 
     if (forward) {
       controls.forward(50 * delta, true);
@@ -42,11 +42,11 @@ export default function Controls() {
       controls.forward(-50 * delta, true);
     }
 
-    if (left) {
+    if (leftward) {
       controls.truck(-50 * delta, 0, true);
     }
 
-    if (right) {
+    if (rightward) {
       controls.truck(50 * delta, 0, true);
     }
 

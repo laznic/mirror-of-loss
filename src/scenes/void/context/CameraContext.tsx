@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { useFrame } from "@react-three/fiber";
+import { createContext, useContext, useRef, useState } from "react";
 import { Vector3 } from "three";
 
 interface CameraContext {

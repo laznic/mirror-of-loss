@@ -3,6 +3,7 @@ import {
   Cloud,
   Cylinder,
   Html,
+  KeyboardControls,
   Plane,
   Sphere,
   useTexture,
@@ -25,8 +26,9 @@ import Arc from "./components/Arc";
 import Wall from "./components/Wall";
 import Entrance from "./components/Entrance";
 import { useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import supabase from "../../supabase";
+import { useSceneContext } from "../main/context/SceneContext";
 
 export function MirrorScene() {
   const flooring = useTexture(Flooring);
@@ -35,6 +37,7 @@ export function MirrorScene() {
   const fancyWall = useTexture(FancyWall);
   const inputRef = useRef(null);
   const [askForMemories, setAskForMemories] = useState(false);
+  const [transitionToVoid, setTransitionToVoid] = useState(false);
 
   flooring.wrapS = RepeatWrapping;
   flooring.wrapT = RepeatWrapping;
@@ -52,12 +55,24 @@ export function MirrorScene() {
     if (askForMemories) {
       inputRef.current.focus();
     }
+
+    console.log(transitionToVoid);
   });
 
+  useEffect(() => {
+    return () => {
+      document.exitPointerLock();
+    };
+  }, []);
+
   return (
-    <>
-      <Physics gravity={[0, -30, 0]} timeStep={"vary"} debug>
-        {/** @ts-expect-error the export is slightly broken in TypeScript so just disabling the TS check here */}
+    <group
+      onPointerDown={() =>
+        document.getElementsByTagName("canvas")[0].requestPointerLock()
+      }
+    >
+      <Physics gravity={[0, -30, 0]} timeStep={"vary"}>
+        {/* @ts-expect-error the export is slightly broken in TypeScript so just disabling the TS check here */}
         <Controller
           camInitDis={-0.01}
           camMinDis={-0.01}
@@ -68,7 +83,9 @@ export function MirrorScene() {
           maxVelLimit={askForMemories ? 0 : undefined}
           jumpVel={askForMemories ? 0 : undefined}
         >
-          <Sphere />
+          <Sphere>
+            <meshStandardMaterial transparent opacity={0} />
+          </Sphere>
         </Controller>
 
         {/* floor */}
@@ -90,12 +107,21 @@ export function MirrorScene() {
               const data = new FormData(e.target);
               const input = data.get("memory");
 
-              await supabase.functions.invoke("generate-memories", {
-                body: {
-                  input,
-                  playerId: localStorage.getItem("uuid"),
-                },
-              });
+              const { data: responseData } = await supabase.functions.invoke(
+                "generate-memories",
+                {
+                  body: {
+                    input,
+                    playerId: localStorage.getItem("uuid"),
+                  },
+                }
+              );
+
+              if (responseData) {
+                setTimeout(() => {
+                  setTransitionToVoid(true);
+                }, 3000);
+              }
             }}
           >
             <input
@@ -107,7 +133,7 @@ export function MirrorScene() {
           </form>
         </Html>
 
-        <Mirror />
+        <Mirror transitionToVoid={transitionToVoid} />
 
         <RigidBody type={"fixed"} position={[0, -0.5, -52.5]}>
           <Box args={[5, 1, 2]} position={[0, 0, 1.5]}>
@@ -173,7 +199,7 @@ export function MirrorScene() {
           <CuboidCollider
             args={[2, 2, 1]}
             sensor
-            // onIntersectionEnter={() => setAskForMemories(true)}
+            onIntersectionEnter={() => setAskForMemories(true)}
           />
         </RigidBody>
 
@@ -253,6 +279,6 @@ export function MirrorScene() {
         <Wall position={[11, 8.5, -25]} />
         <Wall position={[-11, 8.5, -25]} />
       </Physics>
-    </>
+    </group>
   );
 }

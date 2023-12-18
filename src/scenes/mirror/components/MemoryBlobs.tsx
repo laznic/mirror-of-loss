@@ -17,7 +17,12 @@ export default function MemoryBlobs() {
       .channel("memories")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "memories" },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "memories",
+          filter: `player_id=eq.${localStorage.getItem("uuid")}`,
+        },
         (payload) => {
           setMemories((prev) => prev.concat([payload.new]));
         }

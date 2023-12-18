@@ -1,14 +1,24 @@
-import { Environment } from "@react-three/drei";
+import {
+  CameraControls,
+  Environment,
+  KeyboardControls,
+  PointerLockControls,
+  Sphere,
+} from "@react-three/drei";
 import MemoryGroup from "./components/MemoryGroup";
 import { useEffect, useState } from "react";
 import supabase from "../../supabase";
 import Controls from "./components/Controls";
 import CameraContextProvider from "./context/CameraContext";
 import MemoryGroupContextProvider from "./context/MemoryGroupContext";
+import { useSceneContext } from "../main/context/SceneContext";
+import Controller from "ecctrl";
+import { Physics } from "@react-three/rapier";
 
 export default function VoidScene() {
   const [memoryGroups, setMemoryGroups] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const { currentScene } = useSceneContext();
 
   useEffect(() => {
     async function fetchMemoryGroups() {
@@ -62,20 +72,31 @@ export default function VoidScene() {
   return (
     <CameraContextProvider>
       <MemoryGroupContextProvider>
-        <Controls />
+        <KeyboardControls map={keyboardMap}>
+          <Controls />
 
-        {memoryGroups.map((group) => (
-          <MemoryGroup
-            date={group.created_at}
-            key={group.id}
-            id={group.id}
-            memory={group.memory}
-            position={[group.x, group.y, group.z]}
-          />
-        ))}
-
+          {memoryGroups.map((group) => (
+            <MemoryGroup
+              date={group.created_at}
+              key={group.id}
+              id={group.id}
+              memory={group.memory}
+              position={[group.x, group.y, group.z]}
+            />
+          ))}
+        </KeyboardControls>
         <Environment preset="night" background blur={2} />
       </MemoryGroupContextProvider>
     </CameraContextProvider>
   );
 }
+
+const keyboardMap = [
+  { name: "forward", keys: ["ArrowUp", "w", "W"] },
+  { name: "backward", keys: ["ArrowDown", "s", "S"] },
+  { name: "leftward", keys: ["ArrowLeft", "a", "A"] },
+  { name: "rightward", keys: ["ArrowRight", "d", "D"] },
+  { name: "jump", keys: ["Space"] },
+  { name: "run", keys: ["Shift"] },
+  { name: "crouch", keys: ["c", "C"] },
+];
