@@ -6,6 +6,7 @@ import {
   Plane,
   RoundedBox,
   Sphere,
+  useCursor,
   useTexture,
 } from "@react-three/drei";
 
@@ -105,6 +106,7 @@ function Blob({ imageUrl, position, onClick, showVideo, index }: BlobProps) {
   const floatRef = useRef<Group>(null);
   const planeRef = useRef<Group>(null);
   const [hovering, setHovering] = useState(false);
+  useCursor(hovering);
 
   useFrame(() => {
     if (!groupRef.current) return;

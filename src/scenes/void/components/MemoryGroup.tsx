@@ -4,6 +4,7 @@ import {
   MeshTransmissionMaterial,
   Sphere,
   Text,
+  useCursor,
 } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import Blobs from "./Blobs";
@@ -40,6 +41,8 @@ export default function MemoryGroup({
     scale: 0,
   }));
 
+  useCursor(hovering);
+
   useEffect(() => {
     if (currentGroup === id) {
       api.start({ scale: 1 });
@@ -71,7 +74,7 @@ export default function MemoryGroup({
               distortionScale={0.2}
               temporalDistortion={0.5}
               color={"#fbd9ff"}
-              roughness={0}
+              roughness={0.2}
               chromaticAberration={5}
               anisotropicBlur={2}
               transmission={0.95}

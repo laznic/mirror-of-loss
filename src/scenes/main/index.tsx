@@ -1,6 +1,7 @@
 import VoidScene from "../void";
 import { MirrorScene } from "../mirror";
 import { Route } from "wouter";
+import CameraContextProvider from "../void/context/CameraContext";
 
 export default function MainScene() {
   return (
@@ -15,7 +16,9 @@ export default function MainScene() {
           color={"#fff"}
           position={[-3, 1.5, 3]}
         />
-        <VoidScene />
+        <CameraContextProvider>
+          <VoidScene />
+        </CameraContextProvider>
       </Route>
     </>
   );

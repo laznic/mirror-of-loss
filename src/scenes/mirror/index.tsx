@@ -23,7 +23,7 @@ import Step from "../../assets/step.png";
 import Platform from "../../assets/platform.png";
 import RedactionRegular from "../../assets/Redaction-Regular.otf";
 
-import { DoubleSide, Object3D, RepeatWrapping } from "three";
+import { DoubleSide, RepeatWrapping } from "three";
 import SidePillar from "./components/SidePillar";
 import Arc from "./components/Arc";
 import Wall from "./components/Wall";
@@ -199,6 +199,11 @@ export function MirrorScene() {
                 setGenerated(true);
 
                 if (responseData) {
+                  localStorage.setItem(
+                    "memoryGroupId",
+                    JSON.stringify(responseData.memoryId)
+                  );
+
                   setTimeout(() => {
                     setTransitionToVoid(true);
                   }, 8000);
