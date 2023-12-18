@@ -18,7 +18,7 @@ Built with
 - [Stable Diffusion](https://stability.ai/stable-diffusion)
 - [Stable Audio](https://www.stableaudio.com/)
 - [OpenAI](https://openai.com/)
-- 
+  
 ## How it works
 
 The steps are simple:
@@ -33,6 +33,8 @@ The steps are simple:
 List of Supabase features used:
 - Database
   - storing memory groups and memories
+- Realtime
+  - display created memories in real-time
 - Functions
   - handles the memory generation via GPT-4 and SD 
 - Storage
