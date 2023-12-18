@@ -39,12 +39,12 @@ function App() {
         <KeyboardControls map={keyboardMap}>
           <ambientLight color={"#fff"} />
 
-          {/* <fog color="#000" attach="fog" near={50} far={700} /> */}
-          <directionalLight
+          <fog color="#000" attach="fog" near={1} far={120} />
+          {/* <directionalLight
             intensity={5}
             color={"#fff"}
             position={[-3, 1.5, 3]}
-          />
+          /> */}
           <SceneContextProvider>
             <MainScene />
           </SceneContextProvider>

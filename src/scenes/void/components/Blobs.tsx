@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import supabase from "../../../supabase";
 import {
-  Box,
   Float,
   MeshTransmissionMaterial,
   Plane,

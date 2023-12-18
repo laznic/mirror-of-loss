@@ -22,6 +22,8 @@ export default function SidePillar({
     <group position={position}>
       <RigidBody type="fixed">
         <Plane
+          receiveShadow
+          castShadow
           args={[12, 12]}
           position={[0.4 * (brazierFlipped ? -1 : 1), 4.75, 0]}
           rotation={[0, 1.57079, 0]}

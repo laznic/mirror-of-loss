@@ -12,6 +12,12 @@ export default function Arc({ position }: ArcProps) {
 
   return (
     <RigidBody type={"fixed"} colliders={false} position={position}>
+      <pointLight
+        intensity={23}
+        distance={5}
+        color={"#ff08e6"}
+        position={[0, 17, -3]}
+      />
       <Plane args={[25, 20]} position={[0, 9, -4.2]} castShadow>
         <meshLambertMaterial map={arc} alphaTest={1} side={DoubleSide} />
       </Plane>
