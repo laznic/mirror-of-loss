@@ -1,8 +1,8 @@
 import { Canvas } from "@react-three/fiber";
 import "./App.css";
-import { Html, KeyboardControls, Loader } from "@react-three/drei";
+import { Html, KeyboardControls } from "@react-three/drei";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MainScene from "./scenes/main";
 import SceneContextProvider from "./scenes/main/context/SceneContext";
 
@@ -70,15 +70,12 @@ function App() {
         {(start || localStorage.getItem("memoryGroupId")) && (
           <KeyboardControls map={keyboardMap}>
             <ambientLight color={"#fff"} />
-            <Suspense fallback={null}>
-              <SceneContextProvider>
-                <MainScene />
-              </SceneContextProvider>
-            </Suspense>
+            <SceneContextProvider>
+              <MainScene />
+            </SceneContextProvider>
           </KeyboardControls>
         )}
       </Canvas>
-      <Loader />
     </>
   );
 }
