@@ -5,7 +5,6 @@ import {
   Sphere,
   MeshTransmissionMaterial,
   MeshDistortMaterial,
-  Plane,
 } from "@react-three/drei";
 
 import { useRef } from "react";
@@ -13,7 +12,6 @@ import { useFrame } from "@react-three/fiber";
 import { DoubleSide, MathUtils } from "three";
 
 import MirrorTexture from "../../../assets/mirror.png";
-import Helmet from "../../../assets/helmet.png";
 import { RigidBody } from "@react-three/rapier";
 import { useSceneContext } from "../../main/context/SceneContext";
 
@@ -23,7 +21,6 @@ interface MirrorProps {
 
 export default function Mirror({ transitionToVoid }: MirrorProps) {
   const texture = useTexture(MirrorTexture);
-  const helmet = useTexture(Helmet);
   const sphereRef = useRef(null);
   const blackSphere = useRef(null);
   const distortRef = useRef(null);
@@ -62,15 +59,6 @@ export default function Mirror({ transitionToVoid }: MirrorProps) {
       <pointLight intensity={20} decay={1.5} position={[0, -2, -87]} />
 
       <RigidBody type={"fixed"} position={[0, -1, -90]}>
-        <Plane args={[10, 10]} position={[0, 3.2, 0.1]}>
-          <MeshReflectorMaterial
-            map={helmet}
-            mirror={0.1}
-            alphaTest={1}
-            side={DoubleSide}
-          />
-        </Plane>
-
         <Circle args={[5, 100]}>
           <MeshReflectorMaterial
             map={texture}
