@@ -53,7 +53,8 @@ I'm a big fan of Baldur's Gate games, and especially been loving the latest inst
 - More shaders
 - Proper transitions between scenes
 - Adjustments to lighting and other styles
-- A lot of organization for the components and stuff  
+- A lot of organization for the components and stuff
+- Image optimization via Sharp(?)
 
 ## The team / contributors
 - Niklas Lepistö ([GitHub](https://github.com/laznic), [Twitter](https://twitter.com/laznic))
