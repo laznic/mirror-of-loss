@@ -16,7 +16,6 @@ import MirrorTexture from "../../../assets/mirror.png";
 import Helmet from "../../../assets/helmet.png";
 import { RigidBody } from "@react-three/rapier";
 import { useSceneContext } from "../../main/context/SceneContext";
-import { useLocation } from "wouter";
 
 interface MirrorProps {
   transitionToVoid: boolean;
@@ -29,7 +28,6 @@ export default function Mirror({ transitionToVoid }: MirrorProps) {
   const blackSphere = useRef(null);
   const distortRef = useRef(null);
   const { currentScene, setCurrentScene } = useSceneContext();
-  const [, setLocation] = useLocation();
 
   useFrame(() => {
     if (!sphereRef.current) return;
@@ -38,7 +36,7 @@ export default function Mirror({ transitionToVoid }: MirrorProps) {
     sphereRef.current.position.z = MathUtils.lerp(
       sphereRef.current.position.z,
       -25,
-      0.0025
+      0.02
     );
 
     if (
@@ -51,8 +49,7 @@ export default function Mirror({ transitionToVoid }: MirrorProps) {
       setTimeout(() => {
         // Can't get the camera working properly without doing a reload
         setCurrentScene("void");
-        setLocation("/void");
-        window.location.reload();
+        window.location.href = "/void";
       }, 1000);
     }
   });

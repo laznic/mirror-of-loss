@@ -31,6 +31,9 @@ import Entrance from "./components/Entrance";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import supabase from "../../supabase";
+import BackgroundMusic from "../../assets/mirror-background-music.mp3";
+
+const audio = new Audio(BackgroundMusic);
 
 export function MirrorScene() {
   const flooring = useTexture(Flooring);
@@ -79,6 +82,10 @@ export function MirrorScene() {
   });
 
   useEffect(() => {
+    audio.loop = true;
+    audio.volume = 0.1;
+    audio.play();
+
     return () => {
       document.exitPointerLock();
     };
@@ -101,7 +108,7 @@ export function MirrorScene() {
           autoBalance={false}
           camMaxDis={-0.01}
           sprintMult={2}
-          maxVelLimit={askForMemories ? 0 : 20}
+          maxVelLimit={askForMemories ? 0 : 15}
           jumpVel={askForMemories ? 0 : undefined}
         >
           <Sphere>
@@ -201,7 +208,7 @@ export function MirrorScene() {
                 if (responseData) {
                   localStorage.setItem(
                     "memoryGroupId",
-                    JSON.stringify(responseData.memoryId)
+                    JSON.stringify(responseData.memoryGroupId)
                   );
 
                   setTimeout(() => {

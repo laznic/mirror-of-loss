@@ -1,15 +1,8 @@
 import { Canvas } from "@react-three/fiber";
 import "./App.css";
-import {
-  KeyboardControls,
-  MeshPortalMaterial,
-  RoundedBox,
-} from "@react-three/drei";
+import { Html, KeyboardControls, Loader } from "@react-three/drei";
 
-import { MirrorScene } from "./scenes/mirror";
-import VoidScene from "./scenes/void";
-import { useEffect } from "react";
-import { DoubleSide } from "three";
+import { Suspense, useEffect, useState } from "react";
 import MainScene from "./scenes/main";
 import SceneContextProvider from "./scenes/main/context/SceneContext";
 
@@ -24,6 +17,8 @@ const keyboardMap = [
 ];
 
 function App() {
+  const [start, setStart] = useState(false);
+
   useEffect(() => {
     if (!localStorage.getItem("uuid")) {
       localStorage.setItem("uuid", window.crypto.randomUUID());
@@ -32,24 +27,39 @@ function App() {
 
   return (
     <>
+      {!start && !localStorage.getItem("memoryGroupId") && (
+        <div
+          style={{
+            position: "fixed",
+            zIndex: 1,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <h1>Mirror of Loss</h1>
+          <button onClick={() => setStart(true)}>{"Venture forth"}</button>
+        </div>
+      )}
       <Canvas
         shadows
         style={{ width: "100%", height: "100%", background: "#000" }}
       >
-        <KeyboardControls map={keyboardMap}>
-          <ambientLight color={"#fff"} />
-
-          {/* <fog color="#000" attach="fog" near={1} far={120} /> */}
-          {/* <directionalLight
-            intensity={5}
-            color={"#fff"}
-            position={[-3, 1.5, 3]}
-          /> */}
-          <SceneContextProvider>
-            <MainScene />
-          </SceneContextProvider>
-        </KeyboardControls>
+        {(start || localStorage.getItem("memoryGroupId")) && (
+          <KeyboardControls map={keyboardMap}>
+            <ambientLight color={"#fff"} />
+            <Suspense fallback={null}>
+              <SceneContextProvider>
+                <MainScene />
+              </SceneContextProvider>
+            </Suspense>
+          </KeyboardControls>
+        )}
       </Canvas>
+      <Loader />
     </>
   );
 }

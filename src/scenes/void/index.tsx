@@ -6,6 +6,9 @@ import Controls from "./components/Controls";
 import MemoryGroupContextProvider from "./context/MemoryGroupContext";
 import { useCameraContext } from "./context/CameraContext";
 import { Vector3 } from "three";
+import BackgroundMusic from "../../assets/void-background-music.mp3";
+
+const audio = new Audio(BackgroundMusic);
 
 export default function VoidScene() {
   const [memoryGroups, setMemoryGroups] = useState([]);
@@ -24,7 +27,7 @@ export default function VoidScene() {
         setLookAt(new Vector3(data.x, data.y, data.z));
       }
 
-      localStorage.removeItem("memoryGroupId");
+      // localStorage.removeItem("memoryGroupId");
     }
 
     if (localStorage.getItem("memoryGroupId") && memoryGroups.length > 0) {
@@ -43,6 +46,10 @@ export default function VoidScene() {
         setMemoryGroups((prev) => prev.concat(data));
       }
     }
+
+    audio.volume = 0.2;
+    audio.loop = true;
+    audio.play();
 
     fetchMemoryGroups();
   }, []);
