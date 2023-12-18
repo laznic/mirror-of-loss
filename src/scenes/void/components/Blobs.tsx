@@ -5,6 +5,7 @@ import {
   Float,
   MeshTransmissionMaterial,
   Plane,
+  RoundedBox,
   Sphere,
   useTexture,
 } from "@react-three/drei";
@@ -101,17 +102,6 @@ function Blob({ imageUrl, position, onClick, showVideo, index }: BlobProps) {
     () => (textureLoaded.current = true)
   );
 
-  const [video] = useState(() => {
-    const vid = document.createElement("video");
-    vid.src =
-      "https://replicate.delivery/pbxt/aPTXL6n2ZYqgFVNgT5OP7NdLsNVPh5PS7Ee5b0g3EHhnmpAJA/000087.mp4";
-    vid.crossOrigin = "Anonymous";
-    vid.loop = true;
-    vid.muted = true;
-    vid.play();
-    return vid;
-  });
-
   const groupRef = useRef<Group>(null);
   const floatRef = useRef<Group>(null);
   const planeRef = useRef<Group>(null);
@@ -174,7 +164,7 @@ function Blob({ imageUrl, position, onClick, showVideo, index }: BlobProps) {
   return (
     <>
       <group ref={planeRef} visible={showVideo} position={position}>
-        <Box args={[10, 10]}>
+        <RoundedBox args={[10, 10, 0.5]} radius={1}>
           <MeshTransmissionMaterial
             distortionScale={0.1}
             temporalDistortion={1}
@@ -184,11 +174,9 @@ function Blob({ imageUrl, position, onClick, showVideo, index }: BlobProps) {
             thickness={1}
             anisotropicBlur={1}
           />
-        </Box>
+        </RoundedBox>
         <Plane args={[9, 9]}>
-          <meshLambertMaterial side={DoubleSide}>
-            <videoTexture attach={"map"} args={[video]} />
-          </meshLambertMaterial>
+          <meshLambertMaterial map={texture} side={DoubleSide} />
         </Plane>
       </group>
 

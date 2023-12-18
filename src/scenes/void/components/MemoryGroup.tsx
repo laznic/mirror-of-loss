@@ -6,7 +6,6 @@ import { Vector3, Vector3Tuple } from "three";
 import { useCameraContext } from "../context/CameraContext";
 import { useMemoryGroupContext } from "../context/MemoryGroupContext";
 import RedactionRegular from "../../../assets/Redaction-Regular.otf";
-import RedactionBold from "../../../assets/Redaction-Bold.otf";
 import RedactionItalic from "../../../assets/Redaction-Italic.otf";
 import { format } from "date-fns";
 
@@ -24,8 +23,6 @@ export default function MemoryGroup({
   memory,
 }: MemoryGroupProps) {
   const [hovering, setHovering] = useState(false);
-  const [showBlobs, setShowBlobs] = useState(false);
-  const [blobsHidden, setBlobsHidden] = useState(true);
   const { setCamPos, setLookAt } = useCameraContext();
   const { currentGroup, showBlobsForGroup } = useMemoryGroupContext();
 
@@ -34,22 +31,8 @@ export default function MemoryGroup({
     config: config.wobbly,
   });
 
-  const [{ scale: scale2 }, api] = useSpring(() => ({
+  const [, api] = useSpring(() => ({
     scale: 0,
-    onStart: {
-      scale: () => {
-        if (!showBlobs) {
-          setBlobsHidden(false);
-        }
-      },
-    },
-    onRest: {
-      scale: () => {
-        if (showBlobs) {
-          setBlobsHidden(true);
-        }
-      },
-    },
   }));
 
   useEffect(() => {
