@@ -34,7 +34,7 @@ You can go directly to https://mirrorofloss.com/void to see what kind of memorie
 
 List of Supabase features used:
 - Database
-  - storing memory groups and memories
+  - storing memory groups and memories, using PostGIS to spawn memory groups at random positions without too much overlapping
 - Realtime
   - display created memories in real-time
 - Functions
