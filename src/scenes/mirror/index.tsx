@@ -6,8 +6,8 @@ import {
   MeshReflectorMaterial,
   Plane,
   Sphere,
-  SpotLight,
   useTexture,
+  Text,
 } from "@react-three/drei";
 import MemoryBlobs from "./components/MemoryBlobs";
 import Mirror from "./components/Mirror";
@@ -21,6 +21,7 @@ import WallDecorBack2 from "../../assets/walldecor-back-2.png";
 import FancyWall from "../../assets/fancy-wall.png";
 import Step from "../../assets/step.png";
 import Platform from "../../assets/platform.png";
+import RedactionRegular from "../../assets/Redaction-Regular.otf";
 
 import { DoubleSide, Object3D, RepeatWrapping } from "three";
 import SidePillar from "./components/SidePillar";
@@ -40,9 +41,11 @@ export function MirrorScene() {
   const platform = useTexture(Platform);
   const fancyWall = useTexture(FancyWall);
   const inputRef = useRef(null);
-  const cylinderRef = useRef(new Object3D());
   const [askForMemories, setAskForMemories] = useState(false);
   const [transitionToVoid, setTransitionToVoid] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [generated, setGenerated] = useState(false);
+  const textRef = useRef(null);
 
   flooring.wrapS = RepeatWrapping;
   flooring.wrapT = RepeatWrapping;
@@ -56,9 +59,22 @@ export function MirrorScene() {
   fancyWall.wrapT = RepeatWrapping;
   fancyWall.repeat.set(4, 4);
 
-  useFrame((state) => {
+  useFrame(({ clock }, delta) => {
     if (askForMemories) {
       inputRef.current.focus();
+    }
+
+    const interval = 1 / 100;
+
+    if ((clock.getElapsedTime() / delta) % (1 - interval) <= interval) {
+      if (textRef.current && !generated) {
+        if (textRef.current.text.includes("...")) {
+          textRef.current.text =
+            "You focus on the memory, \n and embrace the void.";
+        } else {
+          textRef.current.text += ".";
+        }
+      }
     }
   });
 
@@ -125,10 +141,47 @@ export function MirrorScene() {
             speed={0.2}
           />
 
-          <Html position={[0, -1, -88]}>
+          {generating && !generated ? (
+            <Text
+              ref={textRef}
+              font={RedactionRegular}
+              position={[0, -1.5, -88]}
+              textAlign="center"
+              color={"#eab5ff"}
+              fontSize={0.2}
+            >
+              {"You focus on the memory, \n and embrace the void."}
+            </Text>
+          ) : !generated ? (
+            <>
+              <Text
+                font={RedactionRegular}
+                position={[0, -1, -88]}
+                textAlign="center"
+                color={"#eab5ff"}
+                fontSize={0.2}
+              >
+                {"Which memory will you \n give to the mirror?"}
+              </Text>
+
+              <Text
+                font={RedactionRegular}
+                position={[0, -2.3, -88]}
+                textAlign="center"
+                color={"#eab5ff"}
+                fontSize={0.075}
+              >
+                {"Press Enter to succumb to Shar's embrace"}
+              </Text>
+            </>
+          ) : null}
+
+          <Html visible={askForMemories} position={[-0.7, -1.5, -88]}>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
+
+                setGenerating(true);
 
                 const data = new FormData(e.target);
                 const input = data.get("memory");
@@ -143,18 +196,24 @@ export function MirrorScene() {
                   }
                 );
 
+                setGenerated(true);
+
                 if (responseData) {
                   setTimeout(() => {
                     setTransitionToVoid(true);
-                  }, 3000);
+                  }, 8000);
                 }
               }}
             >
               <input
+                className="memory-input"
                 name="memory"
+                style={{
+                  display: !askForMemories || generating ? "none" : undefined,
+                }}
                 ref={inputRef}
                 type="text"
-                placeholder="Enter memory"
+                placeholder="Think of a memory..."
               />
             </form>
           </Html>

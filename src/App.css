@@ -40,3 +40,22 @@
 .read-the-docs {
   color: #888;
 }
+
+.memory-input {
+  background: transparent;
+  border: 0;
+  color: white;
+  padding: 20px;
+  font-size: 24px;
+  text-align: center;
+  font-family: Redaction;
+  outline: none;
+}
+
+.memory-input:focus {
+  border-bottom: 1px solid white;
+}
+
+.memory-input::placeholder {
+  color: #9b87a3;
+}
