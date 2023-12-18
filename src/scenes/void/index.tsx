@@ -8,14 +8,14 @@ import MemoryGroupContextProvider from "./context/MemoryGroupContext";
 
 export default function VoidScene() {
   const [memoryGroups, setMemoryGroups] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  // const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     async function fetchMemoryGroups() {
       const { data } = await supabase
         .rpc("memory_groups_with_position")
-        .limit(100)
-        .range(currentPage * 100, currentPage * 100 + 100 - 1);
+        .limit(1000);
+      // .range(currentPage * 100, currentPage * 100 + 100 - 1);
 
       if (data) {
         setMemoryGroups((prev) => prev.concat(data));
@@ -23,14 +23,14 @@ export default function VoidScene() {
     }
 
     fetchMemoryGroups();
-  }, [currentPage]);
+  }, []);
 
   useEffect(() => {
     const channel = supabase
       .channel("memory_groups")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "memory_groups" },
+        { event: "INSERT", schema: "public", table: "memory_groups" },
         async (payload) => {
           const { data } = await supabase
             .rpc("memory_groups_with_position")
