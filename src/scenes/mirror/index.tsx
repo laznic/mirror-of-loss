@@ -145,7 +145,7 @@ export function MirrorScene() {
             <Text
               ref={textRef}
               font={RedactionRegular}
-              position={[0, -1.5, -88]}
+              position={[0, -1.5, -89.5]}
               textAlign="center"
               color={"#eab5ff"}
               fontSize={0.2}
@@ -156,27 +156,27 @@ export function MirrorScene() {
             <>
               <Text
                 font={RedactionRegular}
-                position={[0, -1, -88]}
+                position={[0, -1, -89.5]}
                 textAlign="center"
                 color={"#eab5ff"}
-                fontSize={0.2}
+                fontSize={0.3}
               >
                 {"Which memory will you \n give to the mirror?"}
               </Text>
 
               <Text
                 font={RedactionRegular}
-                position={[0, -2.3, -88]}
+                position={[0, -2.3, -89.5]}
                 textAlign="center"
                 color={"#eab5ff"}
-                fontSize={0.075}
+                fontSize={0.125}
               >
                 {"Press Enter to succumb to Shar's embrace"}
               </Text>
             </>
           ) : null}
 
-          <Html visible={askForMemories} position={[-0.7, -1.5, -88]}>
+          <Html center position={[0, -1.95, -88]}>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
