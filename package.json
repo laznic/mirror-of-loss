@@ -23,9 +23,11 @@
     "ecctrl": "1.0.50",
     "hold-event": "1.1.0",
     "lamina": "1.1.23",
+    "maath": "0.10.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "three": "0.159.0"
+    "three": "0.159.0",
+    "wouter": "2.12.1"
   },
   "devDependencies": {
     "@types/react": "18.2.37",
