@@ -5,7 +5,7 @@
 
 import { corsHeaders } from "../_shared/cors.ts";
 import OpenAI from "https://deno.land/x/openai@v4.20.1/mod.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { base64 } from "https://cdn.jsdelivr.net/gh/hexagon/base64@1/src/base64.js";
 
 const openAI = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") });
