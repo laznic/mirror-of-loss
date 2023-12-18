@@ -1,5 +1,10 @@
 import { config, useSpring, animated } from "@react-spring/three";
-import { MeshDistortMaterial, Sphere, Text } from "@react-three/drei";
+import {
+  MeshDistortMaterial,
+  MeshTransmissionMaterial,
+  Sphere,
+  Text,
+} from "@react-three/drei";
 import { useEffect, useState } from "react";
 import Blobs from "./Blobs";
 import { Vector3, Vector3Tuple } from "three";
@@ -58,16 +63,24 @@ export default function MemoryGroup({
         onPointerLeave={() => setHovering(false)}
       >
         <animated.mesh scale={scale}>
+          <pointLight color={"#e06eff"} intensity={10} position={[0, 2, 2]} />
+          <pointLight color={"#3f5db0"} intensity={30} position={[0, -2, -2]} />
           <Sphere args={[2]}>
-            <MeshDistortMaterial
-              distort={0.4}
+            <MeshTransmissionMaterial
+              distortion={2}
+              distortionScale={0.2}
+              temporalDistortion={0.5}
               color={"#fbd9ff"}
-              reflectivity={0.5}
-              roughness={0.1}
-              transmission={0.75}
-              sheen={0.5}
+              roughness={0}
+              chromaticAberration={5}
+              anisotropicBlur={2}
+              transmission={0.95}
+              sheen={1}
               sheenColor={"#f0a3ff"}
             />
+          </Sphere>
+          <Sphere args={[1.1]}>
+            <meshLambertMaterial color={"#290f3d"} />
           </Sphere>
         </animated.mesh>
         <Text
