@@ -7,9 +7,11 @@ Mirror of Loss is a WebGL experience, and a Baldur's Gate 3 / Forgotten Realms f
 
 https://mirrorofloss.com
 
+[Demo video](https://drive.google.com/file/d/1t9DJvSedcPtayNZb4--8g1-sm4P8X1wf/view)
+
 > **Note**
 >
-> This project is optimized for desktop devices
+> This project is optimized for desktop devices, and is a bit heavy on the GPU at times! Please bare with it, or alternatively run it locally to make it a bit smoother.
 
 Built with
 - [Supabase](https://supabase.com)
